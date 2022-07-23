@@ -81,6 +81,15 @@ function showNews(state = true, action) {
   }
 }
 
+function themes(state = 2, action) {
+  switch (action.type) {
+    case ActionTypes.THEMES:
+      return action.themes;
+    default:
+      return state;
+  }
+}
+
 // 1 is stable, 2 is beta, 3 is alpha
 function curseReleaseChannel(state = 1, action) {
   switch (action.type) {
@@ -149,6 +158,7 @@ export default combineReducers({
   hideWindowOnGameLaunch,
   potatoPcMode,
   showNews,
+  themes,
   curseReleaseChannel,
   java,
   minecraftSettings,

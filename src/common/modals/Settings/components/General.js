@@ -32,7 +32,8 @@ import {
   updatePotatoPcMode,
   updateInstanceSortType,
   updateShowNews,
-  updateCurseReleaseChannel
+  updateCurseReleaseChannel,
+  updateThemes
 } from '../../../reducers/settings/actions';
 import { updateConcurrentDownloads } from '../../../reducers/actions';
 import { openModal } from '../../../reducers/modals/actions';
@@ -151,7 +152,7 @@ function dashUuid(UUID) {
   )}-${UUID.substring(16, 20)}-${UUID.substring(20, 32)}`;
 }
 
-const General = () => {
+export const General = () => {
   /* eslint-disable prettier/prettier */
   const tempPath = useSelector(_getTempPath);
   const dataStorePath = useSelector(_getDataStorePath);
@@ -173,6 +174,7 @@ const General = () => {
   const hideWindowOnGameLaunch = useSelector(
     state => state.settings.hideWindowOnGameLaunch
   );
+  const themes = useSelector(state => state.settings.themes);
   const instanceSortMethod = useSelector(
     state => state.settings.instanceSortOrder
   );
@@ -436,6 +438,25 @@ const General = () => {
           checked={DiscordRPC}
         />
       </Content>
+      <Title>
+        <Content>
+          <p>Test Theming here!</p>
+          <Select
+            css={`
+              width: 100px;
+              text-align: start;
+            `}
+            onChange={e => dispatch(updateThemes(e))}
+            id="themeSwitcher"
+            value={themes}
+            virtual={false}
+          >
+            <Select.Option value={1}>Light</Select.Option>
+            <Select.Option value={2}>Main</Select.Option>
+            <Select.Option value={3}>Dark</Select.Option>
+          </Select>
+        </Content>
+      </Title>
       <Title>
         Minecraft News &nbsp; <FontAwesomeIcon icon={faNewspaper} />
       </Title>

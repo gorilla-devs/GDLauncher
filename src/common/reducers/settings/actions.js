@@ -55,6 +55,15 @@ export function updateInstanceSortType(value) {
   };
 }
 
+export function updateThemes(themes) {
+  return dispatch => {
+    dispatch({
+      type: ActionTypes.THEMES,
+      themes
+    });
+  };
+}
+
 export function updateResolution(resolution) {
   return dispatch => {
     dispatch({

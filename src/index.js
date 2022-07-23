@@ -11,7 +11,7 @@ import { ThemeProvider as StyledThemeProvider } from 'styled-components';
 import { PersistGate } from 'redux-persist/integration/react';
 import { ConnectedRouter } from 'connected-react-router';
 import { configureStore, history } from './common/store/configureStore';
-import theme from './ui/theme';
+import { theme } from './ui/theme';
 import RootDev from './Root-Dev';
 import RootWeb from './Root-Web';
 import RootElectron from './Root-Electron';
