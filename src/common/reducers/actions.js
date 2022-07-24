@@ -1565,10 +1565,129 @@ export function processFTBManifest(instanceName) {
     const instancePath = path.join(instancesPath, instanceName);
     const fileHashes = {};
 
-    const { files } = manifest;
+    const { files: allFiles } = manifest;
     const concurrency = state.settings.concurrentDownloads;
 
+    const files = allFiles.filter(v => v.url && v.url !== '');
+    const CFFiles = allFiles.filter(v => !v.url || v.url === '');
+
+    dispatch(updateDownloadStatus(instanceName, 'Downloading CF files...'));
+    const addonsHashmap = {};
+    const addonsFilesHashmap = {};
+
+    // DOWNLOAD CF FILES
+
+    const _getAddons = async () => {
+      console.log(CFFiles.map(v => v.curseforge?.project));
+      const addons = await getMultipleAddons(
+        CFFiles.map(v => v.curseforge?.project)
+      );
+
+      addons.forEach(v => {
+        addonsHashmap[v.id] = v;
+      });
+    };
+
+    const _getAddonFiles = async () => {
+      await pMap(
+        CFFiles,
+        async item => {
+          const modManifest = await getAddonFile(
+            item.curseforge?.project,
+            item.curseforge?.file
+          );
+
+          addonsFilesHashmap[item.curseforge?.project] = modManifest;
+        },
+        { concurrency: concurrency + 10 }
+      );
+    };
+
+    await Promise.all([_getAddons(), _getAddonFiles()]);
+
     let modManifests = [];
+    const optedOutMods = [];
+    await pMap(
+      CFFiles,
+      async item => {
+        if (!addonsHashmap[item.curseforge?.project]) return;
+        let ok = false;
+        let tries = 0;
+        /* eslint-disable no-await-in-loop */
+        do {
+          tries += 1;
+          if (tries !== 1) {
+            await new Promise(resolve => setTimeout(resolve, 5000));
+          }
+
+          const addon = addonsHashmap[item.curseforge?.project];
+          const isResourcePack = addon.classId === 12;
+          const modManifest = addonsFilesHashmap[item.curseforge?.project];
+          const destFile = path.join(
+            _getInstancesPath(state),
+            instanceName,
+            isResourcePack ? 'resourcepacks' : 'mods',
+            modManifest.fileName
+          );
+
+          const fileExists = await fse.pathExists(destFile);
+
+          if (!fileExists) {
+            if (!modManifest.downloadUrl) {
+              const normalizedModData = normalizeModData(
+                modManifest,
+                item.curseforge?.project,
+                addon.name
+              );
+
+              optedOutMods.push({ addon, modManifest: normalizedModData });
+              return;
+            }
+            await downloadFile(destFile, modManifest.downloadUrl);
+            modManifests = modManifests.concat(
+              normalizeModData(
+                modManifest,
+                item.curseforge?.project,
+                addon.name
+              )
+            );
+          }
+          const percentage = (modManifests.length * 100) / CFFiles.length - 1;
+
+          dispatch(updateDownloadProgress(percentage > 0 ? percentage : 0));
+          ok = true;
+        } while (!ok && tries <= 3);
+        /* eslint-enable no-await-in-loop */
+      },
+      { concurrency }
+    );
+
+    if (optedOutMods.length) {
+      await new Promise((resolve, reject) => {
+        dispatch(
+          openModal('OptedOutModsList', {
+            optedOutMods,
+            instancePath: path.join(_getInstancesPath(state), instanceName),
+            resolve,
+            reject,
+            abortCallback: () => {
+              setTimeout(
+                () => reject(new Error('Download Aborted by the user')),
+                300
+              );
+            }
+          })
+        );
+      });
+    }
+
+    modManifests = modManifests.concat(
+      ...optedOutMods.map(v =>
+        normalizeModData(v.modManifest, v.modManifest.projectID, v.addon.name)
+      )
+    );
+
+    // DOWNLOAD FTB FILES
 
     let prev = 0;
     const updatePercentage = downloaded => {
@@ -1586,7 +1705,6 @@ export function processFTBManifest(instanceName) {
         path: path.join(instancePath, item.path, item.name)
       };
     });
-
     dispatch(updateDownloadStatus(instanceName, 'Downloading FTB files...'));
     await downloadInstanceFiles(
       mappedFiles,

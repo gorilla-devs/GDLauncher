@@ -15,11 +15,12 @@
 /release
 /deploy
 /public/native/*/index.d.ts
+/public/native/*/napi.node
 
 # rust target
 /target
 /napi/target
-/public/napi.node
+/**/*/napi.node
 /napi/napi.node
 /napi/node_modules
 /napi/index.d.ts
