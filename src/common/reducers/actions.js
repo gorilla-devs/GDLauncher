@@ -1568,8 +1568,8 @@ export function processFTBManifest(instanceName) {
     const { files: allFiles } = manifest;
     const concurrency = state.settings.concurrentDownloads;
 
-    const files = allFiles.filter(v => v.url !== '');
-    const CFFiles = allFiles.filter(v => v.url === '');
+    const files = allFiles.filter(v => v.url && v.url !== '');
+    const CFFiles = allFiles.filter(v => !v.url || v.url === '');
 
     dispatch(updateDownloadStatus(instanceName, 'Downloading CF files...'));
     const addonsHashmap = {};
@@ -1578,6 +1578,7 @@ export function processFTBManifest(instanceName) {
     // DOWNLOAD CF FILES
 
     const _getAddons = async () => {
+      console.log(CFFiles.map(v => v.curseforge?.project));
       const addons = await getMultipleAddons(
         CFFiles.map(v => v.curseforge?.project)
       );
