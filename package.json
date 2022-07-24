@@ -1,6 +1,6 @@
 {
   "name": "gdlauncher",
-  "version": "1.1.26",
+  "version": "1.1.27",
   "description": "GDLauncher is simple, yet powerful Minecraft custom launcher with a strong focus on the user experience",
   "keywords": [
     "minecraft",
@@ -48,7 +48,7 @@
     "release:setup": "cross-env-shell NODE_ENV=production APP_TYPE=electron REACT_APP_RELEASE_TYPE=setup \"npm run build\" && npm run build-electron:setup && npm run deploy setup",
     "release:portable": "cross-env-shell NODE_ENV=production APP_TYPE=electron REACT_APP_RELEASE_TYPE=portable \"npm run build\" && npm run build-electron:portable && npm run deploy portable",
     "upload": "node ./scripts/uploadRelease.js",
-    "release": "rimraf ./deploy && npm run release:setup && npm run release:portable",
+    "release": "npm run napi-build && rimraf ./deploy && npm run release:setup && npm run release:portable",
     "prepare": "husky install",
     "napi-build": "cd napi && npm run build && node ../scripts/moveNapi.js"
   },
@@ -150,12 +150,12 @@
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
+    "7zip-bin": "^5.1.1",
     "@loadable/babel-plugin": "^5.13.2",
     "@sentry/integrations": "^6.16.1",
     "@sentry/react": "^6.16.1",
     "@sentry/tracing": "^6.16.1",
     "@sentry/utils": "^6.16.1",
-    "7zip-bin": "^5.1.1",
     "antd": "^4.21.5",
     "axios": "^0.27.2",
     "base64-stream": "^1.0.0",
@@ -184,7 +184,7 @@
     "node-machine-id": "^1.1.12",
     "p-map": "^5.3.0",
     "polished": "^4.1.3",
-    "preact": "^10.6.5",
+    "preact": "^10.8.2",
     "ps-tree": "^1.2.0",
     "randomstring": "^1.2.2",
     "react": "^17.0.2",
@@ -210,7 +210,7 @@
     "reselect": "^4.1.5",
     "rooks": "^5.10.0",
     "semver": "^7.3.5",
-    "slate": "^0.65.3",
+    "slate": "^0.81.3",
     "slate-history": "^0.65.3",
     "slate-react": "^0.65.3",
     "styled-components": "^5.3.0",
