@@ -3177,10 +3177,16 @@ export function launchInstance(instanceName, forceQuit = false) {
 
     const { mcStartupMethod } = state.settings;
     let replaceWith = `..${path.sep}..`;
+    let replaceWithInstancesPath = `.`;
 
     const symLinkDirPath = path.join(userData.split('\\')[0], '_gdl');
+    const symLinkDirPathInstancesPath = path.join(
+      instancePath.split('\\')[0],
+      '_gdl'
+    );
     if (MC_STARTUP_METHODS[mcStartupMethod] === MC_STARTUP_METHODS.SYMLINK) {
       replaceWith = symLinkDirPath;
+      replaceWithInstancesPath = symLinkDirPathInstancesPath;
       if (process.platform === 'win32') await symlink(userData, symLinkDirPath);
     }
 
@@ -3189,6 +3195,16 @@ export function launchInstance(instanceName, forceQuit = false) {
         ? new RegExp(userData.replace(/([.?*+^$[\]\\(){}|-])/g, '\\$1'), 'g')
         : null,
       replaceWith
+    ];
+
+    const replaceRegexInstancesPath = [
+      process.platform === 'win32'
+        ? new RegExp(
+            instancePath.replace(/([.?*+^$[\]\\(){}|-])/g, '\\$1'),
+            'g'
+          )
+        : null,
+      replaceWithInstancesPath
     ];
 
     const { sha1: loggingHash, id: loggingId } =
@@ -3202,6 +3218,7 @@ export function launchInstance(instanceName, forceQuit = false) {
 
     const needsQuote = process.platform !== 'win32';
 
+    console.log('TEST', instancePath);
     console.log(
       `${addQuotes(needsQuote, javaPath)} ${getJvmArguments(
         libraries,
@@ -3228,19 +3245,22 @@ export function launchInstance(instanceName, forceQuit = false) {
     }
 
     let closed = false;
-
     const ps = spawn(
       `${addQuotes(needsQuote, javaPath)}`,
-      jvmArguments.map(v =>
-        v
+      jvmArguments.map(v => {
+        return v
           .toString()
-          .replace(...replaceRegex)
+          .replace(
+            ...(v.includes(instancePath)
+              ? replaceRegexInstancesPath
+              : replaceRegex)
+          )
           .replace(
             // eslint-disable-next-line no-template-curly-in-string
             '-Dlog4j.configurationFile=${path}',
             `-Dlog4j.configurationFile=${addQuotes(needsQuote, loggingPath)}`
-          )
-      ),
+          );
+      }),
       {
         cwd: instancePath,
         shell: process.platform !== 'win32'
