@@ -17,6 +17,8 @@ import {
 } from '../../../common/utils/selectors';
 import { extractFace } from '../utils';
 import { updateLastUpdateVersion } from '../../../common/reducers/actions';
+import { updateJavaArguments } from '../../../common/reducers/settings/actions';
+import { DEFAULT_JAVA_ARGS } from '../utils/constants';
 
 const AddInstanceIcon = styled(Button)`
   position: fixed;
@@ -66,7 +68,7 @@ const Home = () => {
         console.log('No announcement to show');
       }
     };
-
+    dispatch(updateJavaArguments(DEFAULT_JAVA_ARGS));
     init();
   }, []);
 
