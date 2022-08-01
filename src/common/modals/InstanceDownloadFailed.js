@@ -33,14 +33,17 @@ const InstanceDownloadFailed = ({
     setLoading(true);
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    await rollBackInstanceZip(
-      isUpdate,
-      instancesPath,
-      instanceName,
-      tempPath,
-      dispatch,
-      updateInstanceConfig
-    );
+    // if instanceName is ever empty, this will delete ALL instances, so don't run it if we don't have a name
+    if (instanceName) {
+      await rollBackInstanceZip(
+        isUpdate,
+        instancesPath,
+        instanceName,
+        tempPath,
+        dispatch,
+        updateInstanceConfig
+      );
+    }
 
     setLoading(false);
     dispatch(addNextInstanceToCurrentDownload());

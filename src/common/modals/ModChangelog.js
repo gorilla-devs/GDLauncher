@@ -5,10 +5,15 @@ import ReactHtmlParser from 'react-html-parser';
 import { Select } from 'antd';
 import ReactMarkdown from 'react-markdown';
 import Modal from '../components/Modal';
-import { getAddonFileChangelog, getFTBChangelog } from '../api';
+import {
+  getAddonFileChangelog,
+  getFTBChangelog,
+  getModrinthVersionChangelog
+} from '../api';
+import { CURSEFORGE, FTB, MODRINTH } from '../utils/constants';
 
 let latest = {};
-const ModChangelog = ({ modpackId, files, type, modpackName }) => {
+const ModChangelog = ({ projectID, files, type, projectName }) => {
   const [changelog, setChangelog] = useState(null);
   const [loading, setLoading] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
@@ -19,10 +24,18 @@ const ModChangelog = ({ modpackId, files, type, modpackName }) => {
     setLoading(true);
     let data;
     try {
-      if (type === 'ftb') {
-        data = await getFTBChangelog(modpackId, id);
-      } else {
-        data = await getAddonFileChangelog(modpackId, id);
+      switch (type) {
+        case FTB:
+          data = await getFTBChangelog(projectID, id);
+          break;
+        case CURSEFORGE:
+          data = await getAddonFileChangelog(projectID, id);
+          break;
+        case MODRINTH:
+          data = await getModrinthVersionChangelog(id);
+          break;
+        default:
+          throw Error(`Unknown type: ${type}`);
       }
     } catch (err) {
       console.error(err);
@@ -78,12 +91,16 @@ const ModChangelog = ({ modpackId, files, type, modpackName }) => {
           {(files || []).map(v => (
             <Select.Option
               title={
-                type === 'ftb' ? `${modpackName} - ${v.name}` : v.displayName
+                type === 'ftb' || type === MODRINTH
+                  ? `${projectName} - ${v.name}`
+                  : v.displayName
               }
               key={v.id}
               value={v.id}
             >
-              {type === 'ftb' ? `${modpackName} - ${v.name}` : v.displayName}
+              {type === 'ftb' || type === MODRINTH
+                ? `${projectName} - ${v.name}`
+                : v.displayName}
             </Select.Option>
           ))}
         </Select>
@@ -96,23 +113,23 @@ const ModChangelog = ({ modpackId, files, type, modpackName }) => {
                   margin-bottom: 40px;
                 `}
               >
-                {type === 'ftb'
-                  ? `${modpackName} - ${
+                {type === 'ftb' || type === MODRINTH
+                  ? `${projectName} - ${
                       (files || []).find(v => v.id === selectedId)?.name
                     }`
                   : (files || []).find(v => v.id === selectedId)?.displayName}
               </div>
-              {type === 'ftb' ? (
+              {type === CURSEFORGE ? (
+                ReactHtmlParser(changelog)
+              ) : (
                 <ReactMarkdown
                   css={`
                     font-size: 15px;
                     padding: 20px;
                   `}
                 >
-                  {changelog.content}
+                  {changelog.content || changelog}
                 </ReactMarkdown>
-              ) : (
-                ReactHtmlParser(changelog)
               )}
             </>
           ) : (

@@ -424,6 +424,7 @@ const InstanceManager = ({ instanceName }) => {
             modpackId={instance?.loader?.projectID}
             fileID={instance?.loader?.fileID}
             background={background}
+            source={instance?.loader?.source}
             manifest={manifest}
           />
         </Content>

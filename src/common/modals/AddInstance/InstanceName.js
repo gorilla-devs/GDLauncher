@@ -24,8 +24,20 @@ import {
 import { _getInstancesPath, _getTempPath } from '../../utils/selectors';
 import bgImage from '../../assets/mcCube.jpg';
 import { downloadFile } from '../../../app/desktop/utils/downloader';
-import { FABRIC, VANILLA, FORGE, FTB, CURSEFORGE } from '../../utils/constants';
-import { getFTBModpackVersionData } from '../../api';
+import {
+  FABRIC,
+  VANILLA,
+  FORGE,
+  FTB,
+  CURSEFORGE,
+  MODRINTH
+} from '../../utils/constants';
+import {
+  getFTBModpackVersionData,
+  getModrinthVersion,
+  getModrinthVersionManifest,
+  getModrinthVersions
+} from '../../api';
 
 const InstanceName = ({
   in: inProp,
@@ -77,16 +89,25 @@ const InstanceName = ({
 
   const imageURL = useMemo(() => {
     if (!modpack) return null;
-    // Curseforge
-    if (!modpack.synopsis) {
-      return modpack?.logo?.thumbnailUrl;
-    } else {
+
+    if (modpack.art) {
       // FTB
       const image = modpack?.art?.reduce((prev, curr) => {
         if (!prev || curr.size < prev.size) return curr;
         return prev;
       });
       return image.url;
+    } else if (modpack.gallery) {
+      // Modrinth
+      return (
+        modpack.gallery?.find(img => img.featured)?.url ||
+        modpack.gallery?.at(0)?.url ||
+        modpack.icon_url ||
+        ''
+      );
+    } else {
+      // Curseforge
+      return modpack?.logo?.thumbnailUrl;
     }
   }, [modpack]);
 
@@ -103,6 +124,7 @@ const InstanceName = ({
 
     const isCurseForgeModpack = Boolean(version?.source === CURSEFORGE);
     const isFTBModpack = Boolean(modpack?.art);
+    const isModrinthModpack = Boolean(modpack?.project_type);
     let manifest;
 
     // If it's a curseforge modpack grab the manfiest and detect the loader
@@ -286,6 +308,66 @@ const InstanceName = ({
           `background${path.extname(imageURL)}`,
           null,
           ramAmount ? { javaMemory: ramAmount } : null
+        )
+      );
+    } else if (isModrinthModpack) {
+      const manifest = await getModrinthVersionManifest(
+        version?.fileID,
+        path.join(instancesPath, localInstanceName)
+      );
+
+      const mcVersion = manifest.dependencies.minecraft;
+      const dependencies = Object.keys(manifest.dependencies);
+      let loaderType;
+      let loaderVersion;
+      if (dependencies.includes('fabric-loader')) {
+        loaderType = FABRIC;
+        loaderVersion = manifest.dependencies['fabric-loader'];
+      } else if (dependencies.includes('forge')) {
+        loaderType = FORGE;
+        loaderVersion = convertcurseForgeToCanonical(
+          manifest.dependencies['forge'],
+          mcVersion,
+          forgeManifest
+        );
+      } else if (dependencies.includes('quilt-loader')) {
+        // we don't support Quilt yet, so we can't proceed with the installation
+        dispatch(closeModal());
+        throw Error('Quilt modpacks are not yet supported.');
+
+        // loaderType = QUILT;
+        // loaderVersion = manifest.dependencies['quilt-loader'];
+      }
+
+      const loader = {
+        loaderType,
+        mcVersion,
+        loaderVersion,
+        fileID: version?.fileID,
+        projectID: version?.projectID,
+        source: MODRINTH,
+        sourceName: originalMcName
+      };
+
+      if (imageURL) {
+        await downloadFile(
+          path.join(
+            instancesPath,
+            localInstanceName,
+            `background${path.extname(imageURL)}`
+          ),
+          imageURL
+        );
+      }
+
+      dispatch(
+        addToQueue(
+          localInstanceName,
+          loader,
+          manifest,
+          `background${path.extname(imageURL)}`,
+          null,
+          null
         )
       );
     } else if (importZipPath) {

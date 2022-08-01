@@ -389,14 +389,29 @@ const Instance = ({ instanceName }) => {
             disabled={Boolean(isInQueue) || Boolean(isPlaying)}
             onClick={async () => {
               let manifest = null;
-              try {
+              const isCursePack = await fs
+                .stat(path.join(instancesPath, instanceName, 'manifest.json'))
+                .then(() => true)
+                .catch(() => false);
+
+              if (isCursePack) {
+                // CurseForge
                 manifest = JSON.parse(
                   await fs.readFile(
                     path.join(instancesPath, instanceName, 'manifest.json')
                   )
                 );
-              } catch {
-                // NO-OP
+              } else {
+                // Modrinth
+                manifest = JSON.parse(
+                  await fs.readFile(
+                    path.join(
+                      instancesPath,
+                      instanceName,
+                      'modrinth.index.json'
+                    )
+                  )
+                );
               }
 
               dispatch(

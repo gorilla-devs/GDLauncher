@@ -285,22 +285,3 @@ export const getSize = async dir => {
       .catch(e => reject(e));
   });
 };
-
-export const addQuotes = (needsQuote, string) => {
-  return needsQuote ? `"${string}"` : string;
-};
-
-export const replaceLibraryDirectory = (arg, librariesDir) => {
-  const parsedArg = arg.replace(/\${library_directory}/g, `"${librariesDir}`);
-  const regex = /\${classpath_separator}/g;
-  const isLibrariesArgString = arg.match(regex);
-  const splittedString = parsedArg.split(regex);
-  splittedString[splittedString.length - 1] = `${
-    splittedString[splittedString.length - 1]
-  }"`;
-
-  return isLibrariesArgString
-    ? // eslint-disable-next-line no-template-curly-in-string
-      splittedString.join('${classpath_separator}')
-    : arg;
-};
