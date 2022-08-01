@@ -417,7 +417,7 @@ const ModOverview = ({
               } else if (source === MODRINTH) {
                 const version = await getModrinthVersion(selectedItem);
                 const newFile = dispatch(
-                  installModrinthMod(version, instanceName)
+                  installModrinthMod(version, instanceName, gameVersion)
                 );
                 setInstalledData({ fileID: selectedItem, fileName: newFile });
               }
