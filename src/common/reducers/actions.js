@@ -60,8 +60,10 @@ import {
   getJavaLatestManifest,
   getJavaManifest,
   getMcManifest,
-  getModrinthVersionManifest,
   getModrinthCategories,
+  getModrinthProject,
+  getModrinthVersionManifest,
+  getModrinthVersions,
   getMultipleAddons,
   mcAuthenticate,
   mcInvalidate,
@@ -73,7 +75,6 @@ import {
   msExchangeCodeForAccessToken,
   msMinecraftProfile,
   msOAuthRefresh,
-  getModrinthVersions,
   getVersionsFromHashes
 } from '../api';
 import {
@@ -3600,9 +3601,15 @@ export function installMod(
 /**
  * @param {ModrinthVersion} version
  * @param {string} instanceName
+ * @param {string} gameVersion
  * @param {Function} onProgress
  */
-export function installModrinthMod(version, instanceName, onProgress) {
+export function installModrinthMod(
+  version,
+  instanceName,
+  gameVersion,
+  onProgress
+) {
   return async (dispatch, getState) => {
     const state = getState();
     const instancesPath = _getInstancesPath(state);
@@ -3617,45 +3624,48 @@ export function installModrinthMod(version, instanceName, onProgress) {
       })
     );
 
-    const dependencies = (await resolveModrinthDependencies(version)).filter(
+    // TODO: this array sometimes contains an empty array?
+    const dependencies = (
+      await resolveModrinthDependencies(version, gameVersion)
+    ).filter(
       dep => existingMods.find(mod => mod.fileID === dep.id) === undefined
     );
 
     // install dependencies and the mod that we want
     await pMap(
       [...dependencies, version],
-      async v => {
-        const primaryFile = v.files.find(f => f.primary);
+      v => {
+        v.files?.forEach(async file => {
+          const destFile = path.join(instancePath, 'mods', file.filename);
+          const tempFile = path.join(_getTempPath(state), file.filename);
 
-        const destFile = path.join(instancePath, 'mods', primaryFile.filename);
-        const tempFile = path.join(_getTempPath(state), primaryFile.filename);
+          // download the mod
+          await downloadFile(tempFile, file.url, onProgress);
 
-        // download the mod
-        await downloadFile(tempFile, primaryFile.url, onProgress);
-
-        // add mod to the mods list in the instance's config file
-        await dispatch(
-          updateInstanceConfig(instanceName, config => {
-            return {
-              ...config,
-              mods: [
-                ...config.mods,
-                ...[
-                  {
-                    source: MODRINTH,
-                    projectID: v.project_id,
-                    fileID: v.id,
-                    fileName: primaryFile.filename,
-                    displayName: primaryFile.filename,
-                    downloadUrl: primaryFile.url
-                  }
+          // add mod to the mods list in the instance's config file
+          await dispatch(
+            updateInstanceConfig(instanceName, config => {
+              return {
+                ...config,
+                mods: [
+                  ...config.mods,
+                  ...[
+                    {
+                      source: MODRINTH,
+                      projectID: v.project_id,
+                      fileID: v.id,
+                      fileName: file.filename,
+                      displayName: file.filename,
+                      downloadUrl: file.url
+                    }
+                  ]
                 ]
-              ]
-            };
-          })
-        );
+              };
+            })
+          );
 
-        await fse.move(tempFile, destFile, { overwrite: true });
+          await fse.move(tempFile, destFile, { overwrite: true });
+        });
       },
       { concurrency: 2 }
     );
@@ -3664,16 +3674,38 @@ export function installModrinthMod(version, instanceName, onProgress) {
 
 /**
  * Recursively gets all the dependent versions of a given version and returns them in one array
- * @param {ModrinthVersion} version
+ * @param {ModrinthVersion} version The mod version to get the dependencies for
+ * @param {string} gameVersion The required Minecraft version, so we can ensure dependencies are compatible
  * @returns {Promise<ModrinthVersion[]>}
  */
-async function resolveModrinthDependencies(version) {
+async function resolveModrinthDependencies(version, gameVersion) {
   // TODO: Ideally this function should be aware of mods the user already has installed and ignore them
 
+  // Note: version.dependencies[].version_id can sometimes be null.
+  // In this case we use the given project_id and select the most recent compatible version.
+
   // Get the IDs for this version's required dependencies
-  const depVersionIDs = version.dependencies
-    .filter(v => v.dependency_type === 'required')
-    .map(v => v.version_id);
+  const depVersionIDs = await pMap(
+    version.dependencies.filter(dep => dep.dependency_type === 'required'),
+    async dep => {
+      if (dep.version_id) return dep.version_id;
+
+      const project = await getModrinthProject(dep.project_id);
+      const availableModVersions = await getModrinthVersions(project.versions);
+
+      // Get the latest compatible version
+      const compatibleModVersions = availableModVersions
+        .filter(v => v.game_versions.includes(gameVersion))
+        .sort((a, b) => a.date_published - b.date_published);
+      // prioritise stable releases, fall back to unstable releases if no compatible stable releases exist
+      const latestCompatibleModVersion =
+        compatibleModVersions.find(v => v.version_type === 'release') ??
+        compatibleModVersions.find(v => v.version_type === 'beta') ??
+        compatibleModVersions.find(v => v.version_type === 'alpha');
+
+      return latestCompatibleModVersion.id;
+    }
+  );
 
   // If this version does not depend on anything, return nothing
   if (depVersionIDs.length === 0) return [];
@@ -3681,7 +3713,7 @@ async function resolveModrinthDependencies(version) {
   // If we do have dependencies, get the version objects for each of those and recurse on those
   const depVersions = await getModrinthVersions(depVersionIDs);
   const subDepVersions = await pMap(depVersions, async v =>
-    resolveModrinthDependencies(v)
+    resolveModrinthDependencies(v, gameVersion)
   );
 
   return [...depVersions, ...subDepVersions];
@@ -3702,6 +3734,7 @@ export const deleteMod = (instanceName, mod) => {
   };
 };
 
+// TODO: Support Modrinth here
 export const updateMod = (
   instanceName,
   mod,

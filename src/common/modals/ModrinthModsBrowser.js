@@ -102,7 +102,8 @@ const ModsListWrapper = ({
   searchQuery,
   width,
   height,
-  itemData
+  itemData,
+  instance
 }) => {
   // If there are more items to be loaded then add an extra row to hold a loading indicator.
   const itemCount = hasNextPage ? items.length + 3 : items.length;
@@ -217,7 +218,11 @@ const ModsListWrapper = ({
                     item.project_id
                   );
                   const compatibleModVersions = availableModVersions
-                    .filter(v => v.game_versions.includes(gameVersion))
+                    .filter(
+                      v =>
+                        v.game_versions.includes(gameVersion) &&
+                        v.loaders.includes(instance.loader?.loaderType)
+                    )
                     .sort((a, b) => a.date_published - b.date_published);
                   // prioritise stable releases, fall back to unstable releases if no compatible stable releases exist
                   const latestCompatibleModVersion =
@@ -239,6 +244,7 @@ const ModsListWrapper = ({
                       installModrinthMod(
                         latestCompatibleModVersion,
                         instanceName,
+                        gameVersion,
                         p => {
                           if (parseInt(p, 10) !== prev) {
                             prev = parseInt(p, 10);
@@ -513,6 +519,7 @@ const ModrinthModsBrowser = ({ instanceName, gameVersion }) => {
                 installedMods={installedMods}
                 instanceName={instanceName}
                 itemData={itemData}
+                instance={instance}
               />
             )}
           </AutoSizer>
