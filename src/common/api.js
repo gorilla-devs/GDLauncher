@@ -230,14 +230,14 @@ export const getJavaLatestManifest = () => {
 
 export const getFabricJson = ({ mcVersion, loaderVersion }) => {
   return axios.get(
-    `${QUILT_APIS}/versions/loader/${encodeURIComponent(
+    `${FABRIC_APIS}/versions/loader/${encodeURIComponent(
       mcVersion
     )}/${encodeURIComponent(loaderVersion)}/profile/json`
   );
 };
 export const getQuilt = ({ mcVersion, loaderVersion }) => {
   return axios.get(
-    `${FABRIC_APIS}/versions/loader/${encodeURIComponent(
+    `${QUILT_APIS}/versions/loader/${encodeURIComponent(
       mcVersion
     )}/${encodeURIComponent(loaderVersion)}/profile/json`
   );

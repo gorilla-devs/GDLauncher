@@ -13,14 +13,18 @@ const NewInstance = ({ setVersion, setModpack }) => {
   const quiltManifest = useSelector(state => state.app.quiltManifest)
 
   const filteredVers = useMemo(() => {
-    return getFilteredVersions(vanillaManifest, forgeManifest, fabricManifest);
-  }, [vanillaManifest, forgeManifest, fabricManifest]);
+    return getFilteredVersions(vanillaManifest, forgeManifest, fabricManifest, quiltManifest);
+  }, [vanillaManifest, forgeManifest, fabricManifest, quiltManifest]);
+  console.log(filteredVers + " ggfg")
 
   return (
     <Container>
       <Cascader
         options={filteredVers}
         onChange={v => {
+          if (v == null) {
+            setVersion(null)
+          }
           if (!v) {
             setVersion(null);
           } else if (v[0] === VANILLA) {

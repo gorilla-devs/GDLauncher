@@ -12,6 +12,7 @@ import { exec, spawn } from 'child_process';
 import {
   MC_LIBRARIES_URL,
   FABRIC,
+  QUILT,
   FORGE,
   LATEST_JAVA_VERSION
 } from '../../../common/utils/constants';
@@ -24,6 +25,7 @@ import {
 import { getAddon, getAddonFile, mcGetPlayerSkin } from '../../../common/api';
 import { downloadFile } from './downloader';
 import browserDownload from '../../../common/utils/browserDownload';
+import { v4 } from 'uuid';
 
 export const isDirectory = source =>
   fs.lstat(source).then(r => r.isDirectory());
@@ -214,7 +216,8 @@ export const librariesMapper = (libraries, librariesPath) => {
 export const getFilteredVersions = (
   vanillaManifest,
   forgeManifest,
-  fabricManifest
+  fabricManifest,
+  quiltManifest
 ) => {
   const versions = [
     {
@@ -308,8 +311,43 @@ export const getFilteredVersions = (
             }))
         }
       ]
+    },
+    {
+      value: 'quilt',
+      label: 'Quilt',
+      children: [
+        {
+          value: 'release',
+          label: 'Releases',
+          children: quiltManifest.game
+            .filter(v => v.stable)
+            .map(v => ({
+              value: v.version,
+              label: v.version,
+              children: quiltManifest.loader.map(c => ({
+                value: c.version,
+                label: c.version
+              }))
+            }))
+        },
+        {
+          value: 'snapshot',
+          label: 'Snapshots',
+          children: quiltManifest.game
+            .filter(v => !v.stable)
+            .map(v => ({
+              value: v.version,
+              label: v.version,
+              children: quiltManifest.loader.map(c => ({
+                value: c.version,
+                label: c.version
+              }))
+            }))
+        }
+      ]
     }
   ];
+  console.log("versions: " + versions)
   return versions;
 };
 
@@ -931,14 +969,32 @@ export const isFileModFabric = file => {
   return (
     (file.gameVersions.includes('Fabric') ||
       file.modules.find(v => v.foldername === 'fabric.mod.json')) &&
-    !file.gameVersions.includes('Forge')
+    !file.gameVersions.includes('Forge') &&
+    !file.gameVersions.includes('Quilt')
+  );
+};
+export const isFileModQuilt = file => {
+  return (
+    (file.gameVersions.includes('Quilt') ||
+      file.modules.find(v => v.foldername === 'quilt.mod.json')) &&
+    !file.gameVersions.includes('Forge') &&
+    !file.gameVersions.includes('Fabric')
   );
 };
 
 export const filterFabricFilesByVersion = (files, version) => {
   return files.filter(v => {
     if (Array.isArray(v.gameVersions)) {
-      return v.gameVersions.includes(version) && isFileModFabric(v);
+      return v.gameVersions.includes(version) && isFileModFabric(v) && !isFileModQuilt(v);
+    }
+    return v.gameVersions === version;
+  });
+};
+
+export const filterQuiltFilesByVersion = (files, version) => {
+  return files.filter(v => {
+    if (Array.isArray(v.gameVersions)) {
+      return v.gameVersions.includes(version) && isFileModQuilt(v) && !isFileModFabric(v);
     }
     return v.gameVersions === version;
   });
@@ -947,7 +1003,7 @@ export const filterFabricFilesByVersion = (files, version) => {
 export const filterForgeFilesByVersion = (files, version) => {
   return files.filter(v => {
     if (Array.isArray(v.gameVersions)) {
-      return v.gameVersions.includes(version) && !isFileModFabric(v);
+      return v.gameVersions.includes(version) && !isFileModFabric(v) && !isFileModQuilt(v);
     }
     return v.gameVersions === version;
   });
@@ -1027,5 +1083,10 @@ export const getPatchedInstanceType = instance => {
   if (isForge && !hasJumpLoader) {
     return FORGE;
   }
-  return FABRIC;
+  if (instance.loader?.loaderType === FABRIC) {
+    return FABRIC;
+  }
+  if (instance.loader?.loaderType === QUILT) {
+    return QUILT;
+  }
 };
