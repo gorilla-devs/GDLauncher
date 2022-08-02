@@ -47,6 +47,15 @@ function fabricManifest(state = [], action) {
   }
 }
 
+function quiltManifest(state = [], action) {
+  switch (action.type) {
+    case ActionTypes.UPDATE_QUILT_MANIFEST:
+      return action.data;
+    default:
+      return state;
+  }
+}
+
 function forgeManifest(state = [], action) {
   switch (action.type) {
     case ActionTypes.UPDATE_FORGE_MANIFEST:
@@ -125,6 +134,7 @@ export default combineReducers({
   vanillaManifest,
   forgeManifest,
   fabricManifest,
+  quiltManifest,
   javaManifest,
   javaLatestManifest,
   curseforgeCategories,

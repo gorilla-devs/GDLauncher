@@ -54,6 +54,7 @@ import {
   getCFVersionIds,
   getFabricJson,
   getFabricManifest,
+  getQuiltManifest,
   getForgeManifest,
   getFTBModpackVersionData,
   getJavaLatestManifest,
@@ -153,6 +154,16 @@ export function initManifests() {
       });
       return fabric;
     };
+
+    const getQuiltVersions = async () => {
+      const quilt = (await getQuiltManifest()).data;
+      dispatch({
+        type: ActionTypes.UPDATE_QUILT_MANIFEST,
+        data: quilt
+      });
+      return quilt;
+    };
+
     const getJavaManifestVersions = async () => {
       const java = (await getJavaManifest()).data;
       dispatch({
@@ -214,23 +225,25 @@ export function initManifests() {
       return omitBy(forgeVersions, v => v.length === 0);
     };
     // Using reflect to avoid rejection
-    const [fabric, java, javaLatest, categories, forge, CFVersionIds] =
+    const [fabric, java, javaLatest, categories, forge, quilt, CFVersionIds] =
       await Promise.all([
         reflect(getFabricVersions()),
         reflect(getJavaManifestVersions()),
         reflect(getJavaLatestManifestVersions()),
         reflect(getAddonCategoriesVersions()),
         reflect(getForgeVersions()),
+        reflect(getQuiltVersions()),
         reflect(getCurseForgeVersionIds())
       ]);
 
-    if (fabric.e || java.e || categories.e || forge.e || CFVersionIds.e) {
-      console.error(fabric, java, categories, forge);
+    if (fabric.e || java.e || categories.e || forge.e || quilt.e || CFVersionIds.e) {
+      console.error(fabric, java, categories, forge, quilt);
     }
 
     return {
       mc: mc || app.vanillaManifest,
       fabric: fabric.status ? fabric.v : app.fabricManifest,
+      quilt: quilt.status ? quilt.v : app.quiltManifest,
       java: java.status ? java.v : app.javaManifest,
       javaLatest: javaLatest.status ? javaLatest.v : app.javaLatestManifest,
       categories: categories.status ? categories.v : app.curseforgeCategories,

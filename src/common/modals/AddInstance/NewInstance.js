@@ -10,21 +10,17 @@ const NewInstance = ({ setVersion, setModpack }) => {
   const vanillaManifest = useSelector(state => state.app.vanillaManifest);
   const fabricManifest = useSelector(state => state.app.fabricManifest);
   const forgeManifest = useSelector(state => state.app.forgeManifest);
-  const quiltManifest = useSelector(state => state.app.quiltManifest)
-
+  //const quiltManifest = useSelector(state => state.app.quiltManifest)
+  //console.log("hi")
   const filteredVers = useMemo(() => {
-    return getFilteredVersions(vanillaManifest, forgeManifest, fabricManifest, quiltManifest);
-  }, [vanillaManifest, forgeManifest, fabricManifest, quiltManifest]);
-  console.log(filteredVers + " ggfg")
-
+    return getFilteredVersions(vanillaManifest, forgeManifest, fabricManifest, /*quiltManifest*/)();
+  }, [vanillaManifest, forgeManifest, fabricManifest, /*quiltManifest*/]);
+  console.log(filteredVers)
   return (
     <Container>
       <Cascader
         options={filteredVers}
         onChange={v => {
-          if (v == null) {
-            setVersion(null)
-          }
           if (!v) {
             setVersion(null);
           } else if (v[0] === VANILLA) {
@@ -46,7 +42,7 @@ const NewInstance = ({ setVersion, setModpack }) => {
               loaderType: v[0],
               mcVersion: v[2],
               loaderVersion: v[3]
-            });
+            })
           }
           setModpack(null);
         }}
