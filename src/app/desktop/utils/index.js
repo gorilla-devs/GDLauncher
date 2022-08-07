@@ -577,8 +577,8 @@ export const getJVMArguments112 = (
   args.push(...mcArgs);
 
   if (resolution) {
-    args.push(`--width ${resolution.width}`);
-    args.push(`--height ${resolution.height}`);
+    args.push(`--width=${resolution.width}`);
+    args.push(`--height=${resolution.height}`);
   }
 
   return args;
