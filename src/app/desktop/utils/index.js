@@ -700,8 +700,8 @@ export const getJVMArguments113 = (
   }
 
   if (resolution) {
-    args.push(`--width ${resolution.width}`);
-    args.push(`--height ${resolution.height}`);
+    args.push(`--width=${resolution.width}`);
+    args.push(`--height=${resolution.height}`);
   }
 
   args = args.filter(arg => {
