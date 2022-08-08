@@ -496,7 +496,7 @@ export const getJVMArguments112 = (
       .join(process.platform === 'win32' ? ';' : ':')
   );
 
-  const javaArgs = jvmOptions.filter(arg => arg);
+  const javaArgs = jvmOptions.filter(Boolean);
 
   // if (process.platform === "darwin") {
   //   args.push("-Xdock:name=instancename");
@@ -506,7 +506,7 @@ export const getJVMArguments112 = (
   args.push(`-Xmx${memory}m`);
   args.push(`-Xms${memory}m`);
   args.push(...REQUIRED_JAVA_ARGS.split(' '));
-  if (javaArgs[0]) args.push(...javaArgs);
+  if (javaArgs.length > 0) args.push(...javaArgs);
   args.push(
     `-Djava.library.path=${addQuotes(
       needsQuote,
@@ -604,7 +604,7 @@ export const getJVMArguments113 = (
   let args = mcJson.arguments.jvm.filter(v => !skipLibrary(v));
   const needsQuote = process.platform !== 'win32';
 
-  const javaArgs = jvmOptions.filter(arg => arg);
+  const javaArgs = jvmOptions.filter(Boolean);
   // if (process.platform === "darwin") {
   //   args.push("-Xdock:name=instancename");
   //   args.push("-Xdock:icon=instanceicon");
@@ -619,7 +619,7 @@ export const getJVMArguments113 = (
   }
 
   args.push(...REQUIRED_JAVA_ARGS.split(' '));
-  if (javaArgs[0]) args.push(...javaArgs);
+  if (javaArgs.length > 0) args.push(...javaArgs);
 
   // Eventually inject additional arguments (from 1.17 (?))
   if (mcJson?.forge?.arguments?.jvm) {
