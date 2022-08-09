@@ -14,7 +14,8 @@ import {
   MICROSOFT_XSTS_AUTH_URL,
   MINECRAFT_SERVICES_URL,
   MOJANG_APIS,
-  TECHNIC_API_URL
+  TECHNIC_API_URL,
+  TECHNIC_CLIENT_BUILD
 } from './utils/constants';
 import { sortByDate } from './utils';
 import ga from './utils/analytics';
@@ -27,7 +28,8 @@ const axioInstance = axios.create({
   }
 });
 
-let technicClientBuild = '757'; // Requests to technic api need build id
+// Requests to technic api need build id
+let technicClientBuild = TECHNIC_CLIENT_BUILD;
 
 const trackFTBAPI = () => {
   ga.sendCustomEvent('FTBAPICall');

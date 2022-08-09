@@ -28,6 +28,7 @@ export const VANILLA = 'vanilla';
 
 export const TECHNIC = 'technic';
 export const TECHNIC_SOLDER = 'technic solder';
+export const TECHNIC_CLIENT_BUILD = '757';
 export const CURSEFORGE = 'curseforge';
 export const FTB = 'ftb';
 
