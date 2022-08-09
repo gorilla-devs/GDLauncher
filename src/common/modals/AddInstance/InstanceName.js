@@ -82,7 +82,7 @@ const InstanceName = ({
       });
       return image.url;
     }
-    if (Object.prototype.hasOwnProperty.call(modpack, 'solder')) {
+    if (modpack.hasOwnProperty('solder')) {
       // Technic
       if (modpack.solder) {
         return (
@@ -111,10 +111,7 @@ const InstanceName = ({
 
     const isCurseForgeModpack = Boolean(version?.source === CURSEFORGE);
     const isFTBModpack = Boolean(modpack?.art);
-    const isTechnicModpack = Object.prototype.hasOwnProperty.call(
-      modpack,
-      'solder'
-    );
+    const isTechnicModpack = modpack.hasOwnProperty('solder');
     const isTechnicSolderModpack = isTechnicModpack && modpack.solder;
     let manifest;
 
