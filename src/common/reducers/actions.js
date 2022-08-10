@@ -3203,7 +3203,7 @@ export function launchInstance(instanceName, forceQuit = false) {
     );
 
     const needsQuote = process.platform !== 'win32';
-    const javaPathWithEnvVar = needsQuote ? resolveEnvVars(javaPath) : javaPath;
+    const javaPathWithEnvVar = needsQuote ? javaPath : resolveEnvVars(javaPath);
 
     console.log(
       `${addQuotes(needsQuote, javaPathWithEnvVar)} ${getJvmArguments(
