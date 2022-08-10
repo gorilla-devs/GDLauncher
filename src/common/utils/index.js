@@ -1,3 +1,4 @@
+/* eslint-disable guard-for-in */
 import { ipcRenderer } from 'electron';
 import lockfile from 'lockfile';
 import path from 'path';
@@ -303,4 +304,23 @@ export const replaceLibraryDirectory = (arg, librariesDir) => {
     ? // eslint-disable-next-line no-template-curly-in-string
       splittedString.join('${classpath_separator}')
     : arg;
+};
+
+export const resolveEnvVars = javaPath => {
+  const replacements = {};
+
+  for (const variable in process.env) {
+    console.log('variable', variable);
+    const reference = `%${variable}%`;
+    if (javaPath.includes(reference)) {
+      replacements[reference] = process.env[variable];
+    }
+  }
+
+  if (Object.keys(replacements).length) {
+    const regex = new RegExp(Object.keys(replacements).join('|'), 'gi');
+    return javaPath.replace(regex, match => replacements[match]);
+  }
+
+  return javaPath;
 };

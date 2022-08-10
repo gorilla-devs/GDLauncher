@@ -121,7 +121,8 @@ import {
   getSize,
   makeInstanceRestorePoint,
   removeDuplicates,
-  replaceLibraryDirectory
+  replaceLibraryDirectory,
+  resolveEnvVars
 } from '../utils';
 import { UPDATE_CONCURRENT_DOWNLOADS } from './settings/actionTypes';
 import { UPDATE_MODAL } from './modals/actionTypes';
@@ -2900,6 +2901,7 @@ export function launchInstance(instanceName, forceQuit = false) {
       dispatch(getJavaVersionForMCVersion(loader?.mcVersion))
     );
     const javaPath = customJavaPath || defaultJavaPathVersion;
+
     let missingResource = false;
 
     const verifyResource = async resourcePath => {
@@ -3201,9 +3203,10 @@ export function launchInstance(instanceName, forceQuit = false) {
     );
 
     const needsQuote = process.platform !== 'win32';
+    const javaPathWithEnvVar = needsQuote ? resolveEnvVars(javaPath) : javaPath;
 
     console.log(
-      `${addQuotes(needsQuote, javaPath)} ${getJvmArguments(
+      `${addQuotes(needsQuote, javaPathWithEnvVar)} ${getJvmArguments(
         libraries,
         mcMainFile,
         instancePath,
@@ -3230,7 +3233,7 @@ export function launchInstance(instanceName, forceQuit = false) {
     let closed = false;
 
     const ps = spawn(
-      `${addQuotes(needsQuote, javaPath)}`,
+      `${addQuotes(needsQuote, javaPathWithEnvVar)}`,
       jvmArguments.map(v =>
         v
           .toString()
