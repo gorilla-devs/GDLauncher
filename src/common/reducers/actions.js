@@ -3256,7 +3256,8 @@ export function launchInstance(instanceName, forceQuit = false) {
       ),
       {
         cwd: instancePath,
-        shell: process.platform !== 'win32'
+        shell: process.platform !== 'win32',
+        detached: true
       }
     );
 
