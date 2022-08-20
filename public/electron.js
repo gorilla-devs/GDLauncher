@@ -646,7 +646,7 @@ ipcMain.handle('download-optedout-mod', async (e, { url, filePath }) => {
   let win = new BrowserWindow();
 
   await win.webContents.session.clearCache();
-  await win.webContents.session.clearStorageData();
+  // await win.webContents.session.clearStorageData();
 
   win.webContents.session.webRequest.onBeforeSendHeaders(removeOriginHeader);
 
@@ -742,7 +742,7 @@ ipcMain.handle('download-optedout-mods', async (e, { mods, instancePath }) => {
   let win = new BrowserWindow();
 
   await win.webContents.session.clearCache();
-  await win.webContents.session.clearStorageData();
+  // await win.webContents.session.clearStorageData();
 
   win.webContents.session.webRequest.onBeforeSendHeaders(removeOriginHeader);
 
