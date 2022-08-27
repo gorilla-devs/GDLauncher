@@ -168,21 +168,6 @@ const userAgent = new UserAgent({
 // app.allowRendererProcessReuse = true;
 Menu.setApplicationMenu(Menu.buildFromTemplate(edit));
 
-let oldLauncherUserData = path.join(app.getPath('userData'), 'instances');
-
-// Read config and eventually use new path
-try {
-  const configFile = fss.readFileSync(
-    path.join(app.getPath('userData'), 'config.json')
-  );
-  const config = JSON.parse(configFile);
-  if (config.settings.instancesPath) {
-    oldLauncherUserData = config.settings.instancesPath;
-  }
-} catch {
-  // Do nothing
-}
-
 app.setPath('userData', path.join(app.getPath('appData'), 'gdlauncher_next'));
 
 let allowUnstableReleases = false;
@@ -217,6 +202,34 @@ if (
     );
     app.setPath('userData', override.toString());
   }
+}
+
+// Read config and eventually use new path
+try {
+  const configPath = path.join(app.getPath('userData'), 'config.json');
+  const configFile = fss.readFileSync(configPath);
+  const config = JSON.parse(configFile);
+
+  const requiredArgs = [
+    '-Dfml.ignorePatchDiscrepancies=true',
+    '-Dfml.ignoreInvalidMinecraftCertificates=true'
+  ];
+
+  const javaArgs = config.settings.java.args;
+
+  if (config.settings.java.args) {
+    const cleanedJavaArgs = javaArgs
+      .split(' ')
+      .filter(arg => !requiredArgs.includes(arg))
+      .join(' ');
+
+    if (cleanedJavaArgs.split(' ').length !== javaArgs.split(' ').length) {
+      config.settings.java.args = cleanedJavaArgs;
+      fss.writeFileSync(configPath, JSON.stringify(config));
+    }
+  }
+} catch {
+  // Do nothing
 }
 
 log.log(process.env.REACT_APP_RELEASE_TYPE, app.getVersion());
@@ -553,10 +566,6 @@ ipcMain.handle('getSentryDsn', () => {
   return process.env.SENTRY_DSN;
 });
 
-ipcMain.handle('getOldLauncherUserData', () => {
-  return oldLauncherUserData;
-});
-
 ipcMain.handle('getExecutablePath', () => {
   return path.dirname(app.getPath('exe'));
 });
@@ -637,7 +646,7 @@ ipcMain.handle('download-optedout-mod', async (e, { url, filePath }) => {
   let win = new BrowserWindow();
 
   await win.webContents.session.clearCache();
-  await win.webContents.session.clearStorageData();
+  // await win.webContents.session.clearStorageData();
 
   win.webContents.session.webRequest.onBeforeSendHeaders(removeOriginHeader);
 
@@ -733,7 +742,7 @@ ipcMain.handle('download-optedout-mods', async (e, { mods, instancePath }) => {
   let win = new BrowserWindow();
 
   await win.webContents.session.clearCache();
-  await win.webContents.session.clearStorageData();
+  // await win.webContents.session.clearStorageData();
 
   win.webContents.session.webRequest.onBeforeSendHeaders(removeOriginHeader);
 

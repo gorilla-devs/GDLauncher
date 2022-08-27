@@ -24,6 +24,7 @@ import {
 import { getAddon, getAddonFile, mcGetPlayerSkin } from '../../../common/api';
 import { downloadFile } from './downloader';
 import browserDownload from '../../../common/utils/browserDownload';
+import { REQUIRED_JAVA_ARGS } from './constants';
 
 export const isDirectory = source =>
   fs.lstat(source).then(r => r.isDirectory());
@@ -495,6 +496,8 @@ export const getJVMArguments112 = (
       .join(process.platform === 'win32' ? ';' : ':')
   );
 
+  const javaArgs = jvmOptions.filter(Boolean);
+
   // if (process.platform === "darwin") {
   //   args.push("-Xdock:name=instancename");
   //   args.push("-Xdock:icon=instanceicon");
@@ -502,7 +505,8 @@ export const getJVMArguments112 = (
 
   args.push(`-Xmx${memory}m`);
   args.push(`-Xms${memory}m`);
-  args.push(...jvmOptions);
+  args.push(...REQUIRED_JAVA_ARGS.split(' '));
+  if (javaArgs.length > 0) args.push(...javaArgs);
   args.push(
     `-Djava.library.path=${addQuotes(
       needsQuote,
@@ -577,8 +581,8 @@ export const getJVMArguments112 = (
   args.push(...mcArgs);
 
   if (resolution) {
-    args.push(`--width ${resolution.width}`);
-    args.push(`--height ${resolution.height}`);
+    args.push(`--width=${resolution.width}`);
+    args.push(`--height=${resolution.height}`);
   }
 
   return args;
@@ -600,11 +604,11 @@ export const getJVMArguments113 = (
   let args = mcJson.arguments.jvm.filter(v => !skipLibrary(v));
   const needsQuote = process.platform !== 'win32';
 
+  const javaArgs = jvmOptions.filter(Boolean);
   // if (process.platform === "darwin") {
   //   args.push("-Xdock:name=instancename");
   //   args.push("-Xdock:icon=instanceicon");
   // }
-
   args.push(`-Xmx${memory}m`);
   args.push(`-Xms${memory}m`);
   args.push(
@@ -613,7 +617,9 @@ export const getJVMArguments113 = (
   if (mcJson.logging) {
     args.push(mcJson?.logging?.client?.argument || '');
   }
-  args.push(...jvmOptions);
+
+  args.push(...REQUIRED_JAVA_ARGS.split(' '));
+  if (javaArgs.length > 0) args.push(...javaArgs);
 
   // Eventually inject additional arguments (from 1.17 (?))
   if (mcJson?.forge?.arguments?.jvm) {
@@ -700,8 +706,8 @@ export const getJVMArguments113 = (
   }
 
   if (resolution) {
-    args.push(`--width ${resolution.width}`);
-    args.push(`--height ${resolution.height}`);
+    args.push(`--width=${resolution.width}`);
+    args.push(`--height=${resolution.height}`);
   }
 
   args = args.filter(arg => {

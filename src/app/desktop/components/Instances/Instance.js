@@ -210,13 +210,18 @@ const Instance = ({ instanceName }) => {
     dispatch(openModal('InstanceDuplicateName', { instanceName }));
   };
   const killProcess = () => {
-    console.log(isPlaying.pid);
     psTree(isPlaying.pid, (err, children) => {
+      process.kill(isPlaying.pid);
       if (children?.length) {
         children.forEach(el => {
           if (el) {
             try {
               process.kill(el.PID);
+            } catch {
+              // No-op
+            }
+            try {
+              process.kill(el.PPID);
             } catch {
               // No-op
             }
