@@ -1,48 +1,31 @@
 module.exports = {
-  new: [
-    {
-      header: 'Squashed Git Commit history',
-      content: 'because it was around 0.5G big.',
-      advanced: { cm: '8ec97baa' }
-    }
-  ],
-  improvements: [
-    {
-      header: 'Changed murmur2 calculator',
-      content: 'to napi.',
-      advanced: { cm: '8ec97baa' }
-    }
-  ],
+  new: [],
+  improvements: [],
   bugfixes: [
     {
-      header: 'Fixed the Memory slider',
-      content: 'resetting to a very low point.',
-      advanced: { cm: '8ec97baa', pr: '1382' }
+      header: 'No longer killing the game',
+      content: 'when closing the Launcher.',
+      advanced: { cm: '391dd9cc', pr: '1412' }
     },
     {
-      header: 'Fixed the Update all Mods Button',
-      content: 'sometimes not working properly.',
-      advanced: { cm: '1d17f128', pr: '1381' }
+      header: 'Fixed the game resolution setting',
+      content: 'being ignored.',
+      advanced: { cm: '87f89ed9', pr: '1429' }
     },
     {
-      header: 'Fixed Forge 1.19',
-      content: 'erroring with "launch string to long".',
-      advanced: { cm: '8ec97baa', pr: '1384' }
+      header: 'Fixed the kill button',
+      content: 'having to be clicked twice.',
+      advanced: { cm: '2664f8bb', pr: '1419' }
     },
     {
-      header: 'Fixed the Open Mod page link',
-      content: 'not working.',
-      advanced: { cm: '8ec97baa', pr: '1375' }
+      header: 'Fixed error code one ',
+      content: 'when certain java args are missing.',
+      advanced: { cm: 'cdae501a', pr: '1420' }
     },
     {
-      header: 'Fixed the X button in search bars',
-      content: 'not functioning.',
-      advanced: { cm: '8ec97baa', pr: '1371' }
-    },
-    {
-      header: 'Fixed FTB downloads',
-      content: 'not working.',
-      advanced: { cm: 'b8c7e774', pr: '1410' }
+      header: 'Fixed settings resetting',
+      content: 'caused by the CurseForge workaround.',
+      advanced: { cm: '7f29ca64', pr: '1431' }
     }
   ]
 };
