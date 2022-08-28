@@ -77,6 +77,7 @@
     <script>
       !(function () {
         'use strict';
+        var i = {};
         var a = window.location,
           r = window.document,
           o = r.currentScript,
@@ -104,11 +105,9 @@
               if ('true' === window.localStorage.plausible_ignore)
                 return s('localStorage flag');
             } catch (e) {}
-            var i = {};
             (i.n = e),
-              (i.u = a.href),
-              (i.d = "app.gdevs.io"),
-              (i.r = r.referrer || null),
+              (i.d = 'app.gdevs.io'),
+              (i.r = 'https://app.gdevs.io'),
               (i.w = window.innerWidth),
               t && t.meta && (i.m = JSON.stringify(t.meta)),
               t && t.props && (i.p = t.props),
@@ -126,7 +125,8 @@
         window.plausible = e;
         for (var i, n = 0; n < t.length; n++) e.apply(this, t[n]);
         function w() {
-          (i = a.pathname), e('pageview');
+          (i.u = 'https://app.gdevs.io' + a.hash.slice(1)),
+            e('pageview', { props: { version: '1.1.29' } });
         }
         window.addEventListener('hashchange', w),
           'prerender' === r.visibilityState
