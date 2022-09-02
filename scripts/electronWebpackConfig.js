@@ -26,7 +26,7 @@ const baseConfig = {
         test: /\.node$/,
         loader: 'native-ext-loader',
         options: {
-          basePath: ['native', os.platform()],
+          basePath: ['native'],
           emit: false
         }
       },
