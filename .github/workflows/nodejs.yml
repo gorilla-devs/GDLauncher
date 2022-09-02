@@ -30,7 +30,10 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: '16.13.1'
-
+      - name: Install node-gyp
+        if: matrix.os == 'windows-latest'
+        run: |
+          npm -g i node-gyp
 
       - name: Install Nightly
         run: |
