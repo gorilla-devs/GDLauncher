@@ -7,7 +7,6 @@ const fse = require('fs-extra');
 // eslint-disable-next-line
 const webpack = require('webpack');
 const { merge } = require('webpack-merge');
-const os = require('os');
 const TerserPlugin = require('terser-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
