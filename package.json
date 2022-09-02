@@ -183,7 +183,6 @@
     "make-dir": "^3.1.0",
     "memoize-one": "^6.0.0",
     "node-7z": "^3.0.0",
-    "node-gyp": "^9.1.0",
     "node-machine-id": "^1.1.12",
     "p-map": "^5.3.0",
     "polished": "^4.1.3",
