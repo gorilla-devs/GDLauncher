@@ -22,7 +22,5 @@ jobs:
       - name: Install node-gyp
         if: matrix.os == 'windows-latest'
         run: |
-          npm -g list node-gyp
-          npm -g uninstall node-gyp
-          npm -g install node-gyp
-          npm -g list node-gyp
+         where node
+         npm --version
