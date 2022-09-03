@@ -22,4 +22,4 @@ jobs:
       - name: Install node-gyp
         if: matrix.os == 'windows-latest'
         run: |
-         where node
+         echo $(where node)
