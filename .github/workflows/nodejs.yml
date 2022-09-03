@@ -16,12 +16,16 @@ jobs:
 
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        os: [windows-latest]
 
     steps:
       - name: Install node-gyp
         if: matrix.os == 'windows-latest'
         run: |
          cd $(where node)
+         ls node_modules
+         ls node_modules\npm
+         ls node_modules\npm\node_modules
+         ls node_modules\npm\node_modules\@npmcli
          cd node_modules\npm\node_modules\@npmcli\run-script
          npm install node-gyp@latest
