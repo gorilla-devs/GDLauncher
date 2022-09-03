@@ -23,4 +23,3 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: |
          where node
-         npm --version
