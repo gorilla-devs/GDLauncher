@@ -22,4 +22,6 @@ jobs:
       - name: Install node-gyp
         if: matrix.os == 'windows-latest'
         run: |
-         echo $(where node)
+         cd $(where node)
+         cd node_modules\npm\node_modules\@npmcli\run-script
+         npm install node-gyp@latest
