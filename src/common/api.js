@@ -235,7 +235,7 @@ export const getFabricJson = ({ mcVersion, loaderVersion }) => {
     )}/${encodeURIComponent(loaderVersion)}/profile/json`
   );
 };
-export const getQuilt = ({ mcVersion, loaderVersion }) => {
+export const getQuiltJson = ({ mcVersion, loaderVersion }) => {
   return axios.get(
     `${QUILT_APIS}/versions/loader/${encodeURIComponent(
       mcVersion
@@ -371,7 +371,8 @@ export const getSearch = async (
     sortField,
     sortOrder: isSortDescending ? 'desc' : 'asc',
     gameVersion: gameVersion || '',
-    ...(modLoaderType === 'fabric' && { modLoaderType: 'Fabric' }),
+    // ...(modLoaderType === 'fabric' && { modLoaderType: 'Fabric' }),
+    ...(modLoaderType === 'quilt' && { modLoaderType: 'Quilt' }),
     classId: type === 'mods' ? 6 : 4471,
     searchFilter
   };

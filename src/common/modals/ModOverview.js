@@ -15,11 +15,12 @@ import { closeModal, openModal } from '../reducers/modals/actions';
 import { installMod, updateInstanceConfig } from '../reducers/actions';
 import { remove } from 'fs-extra';
 import { _getInstancesPath, _getInstance } from '../utils/selectors';
-import { FABRIC, FORGE, CURSEFORGE_URL } from '../utils/constants';
+import { FABRIC, FORGE, QUILT, CURSEFORGE_URL } from '../utils/constants';
 import { formatNumber, formatDate } from '../utils';
 import {
   filterFabricFilesByVersion,
   filterForgeFilesByVersion,
+  filterQuiltFilesByVersion,
   getPatchedInstanceType
 } from '../../app/desktop/utils';
 
@@ -59,11 +60,15 @@ const ModOverview = ({
             getPatchedInstanceType(instance) === FABRIC && projectID !== 361988;
           const isForge =
             getPatchedInstanceType(instance) === FORGE || projectID === 361988;
+          const isQuilt = 
+            getPatchedInstanceType(instance) === QUILT;
           let filteredFiles = [];
           if (isFabric) {
             filteredFiles = filterFabricFilesByVersion(data, gameVersions);
           } else if (isForge) {
             filteredFiles = filterForgeFilesByVersion(data, gameVersions);
+          } else if (isQuilt) {
+            filteredFiles = filterQuiltFilesByVersion(data,gameVersions);
           }
 
           setFiles(filteredFiles);

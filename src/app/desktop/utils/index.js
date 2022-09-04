@@ -22,11 +22,9 @@ import {
   removeDuplicates,
   sortByForgeVersionDesc
 } from '../../../common/utils';
-import { getAddon, getAddonFile, getQuiltManifest, mcGetPlayerSkin } from '../../../common/api';
+import { getAddon, getAddonFile, mcGetPlayerSkin } from '../../../common/api';
 import { downloadFile } from './downloader';
 import browserDownload from '../../../common/utils/browserDownload';
-import { v4 } from 'uuid';
-import { useSelector } from 'react-redux';
 
 export const isDirectory = source =>
   fs.lstat(source).then(r => r.isDirectory());
@@ -214,15 +212,13 @@ export const librariesMapper = (libraries, librariesPath) => {
   );
 };
 
-export const getFilteredVersions =  (
+export const getFilteredVersions = (
   vanillaManifest,
   forgeManifest,
   fabricManifest,
-  //quiltManifest
+  quiltManifest
 ) => {
-  
-  
-  const versions =  [
+  const versions = [
     {
       value: 'vanilla',
       label: 'Vanilla',
@@ -322,12 +318,12 @@ export const getFilteredVersions =  (
         {
           value: 'release',
           label: 'Releases',
-          children: fabricManifest.game
+          children: quiltManifest.game
             .filter(v => v.stable)
             .map(v => ({
               value: v.version,
               label: v.version,
-              children: fabricManifest.loader.map(c => ({
+              children: quiltManifest.loader.map(c => ({
                 value: c.version,
                 label: c.version
               }))
@@ -336,12 +332,12 @@ export const getFilteredVersions =  (
         {
           value: 'snapshot',
           label: 'Snapshots',
-          children: fabricManifest.game
+          children: quiltManifest.game
             .filter(v => !v.stable)
             .map(v => ({
               value: v.version,
               label: v.version,
-              children: fabricManifest.loader.map(c => ({
+              children: quiltManifest.loader.map(c => ({
                 value: c.version,
                 label: c.version
               }))
@@ -987,7 +983,11 @@ export const isFileModQuilt = file => {
 export const filterFabricFilesByVersion = (files, version) => {
   return files.filter(v => {
     if (Array.isArray(v.gameVersions)) {
-      return v.gameVersions.includes(version) && isFileModFabric(v) && !isFileModQuilt(v);
+      return (
+        v.gameVersions.includes(version) &&
+        isFileModFabric(v) &&
+        !isFileModQuilt(v)
+      );
     }
     return v.gameVersions === version;
   });
@@ -996,7 +996,11 @@ export const filterFabricFilesByVersion = (files, version) => {
 export const filterQuiltFilesByVersion = (files, version) => {
   return files.filter(v => {
     if (Array.isArray(v.gameVersions)) {
-      return v.gameVersions.includes(version) && isFileModQuilt(v) && !isFileModFabric(v);
+      return (
+        v.gameVersions.includes(version) &&
+        isFileModQuilt(v) &&
+        !isFileModFabric(v)
+      );
     }
     return v.gameVersions === version;
   });
@@ -1005,7 +1009,11 @@ export const filterQuiltFilesByVersion = (files, version) => {
 export const filterForgeFilesByVersion = (files, version) => {
   return files.filter(v => {
     if (Array.isArray(v.gameVersions)) {
-      return v.gameVersions.includes(version) && !isFileModFabric(v) && !isFileModQuilt(v);
+      return (
+        v.gameVersions.includes(version) &&
+        !isFileModFabric(v) &&
+        !isFileModQuilt(v)
+      );
     }
     return v.gameVersions === version;
   });

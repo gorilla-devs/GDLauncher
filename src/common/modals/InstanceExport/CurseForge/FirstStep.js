@@ -38,6 +38,7 @@ export default function FirstStep({
     path.join(instancePath, 'logs'),
     path.join(instancePath, '.mixin.out'),
     path.join(instancePath, '.fabric'),
+    path.join(instancePath, '.quilt'),
     path.join(instancePath, 'screenshots'),
     path.join(instancePath, 'crash-reports'),
     path.join(instancePath, 'manifest.json')

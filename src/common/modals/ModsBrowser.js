@@ -29,11 +29,12 @@ import { getSearch, getAddonFiles } from '../api';
 import { openModal } from '../reducers/modals/actions';
 import { _getInstance } from '../utils/selectors';
 import { installMod } from '../reducers/actions';
-import { FABRIC, FORGE } from '../utils/constants';
+import { FABRIC, FORGE, QUILT } from '../utils/constants';
 import {
   getFirstPreferredCandidate,
   filterFabricFilesByVersion,
   filterForgeFilesByVersion,
+  filterQuiltFilesByVersion,
   getPatchedInstanceType
 } from '../../app/desktop/utils';
 
@@ -219,6 +220,7 @@ const ModsListWrapper = ({
 
                   const isFabric = getPatchedInstanceType(instance) === FABRIC;
                   const isForge = getPatchedInstanceType(instance) === FORGE;
+                  const isQuilt = getPatchedInstanceType(instance) === QUILT;
 
                   let filteredFiles = [];
 
@@ -229,6 +231,11 @@ const ModsListWrapper = ({
                     );
                   } else if (isForge) {
                     filteredFiles = filterForgeFilesByVersion(
+                      files,
+                      gameVersions
+                    );
+                  } else if (isQuilt) {
+                    filteredFiles = filterQuiltFilesByVersion(
                       files,
                       gameVersions
                     );

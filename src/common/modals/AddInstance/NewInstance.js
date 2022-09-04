@@ -5,17 +5,18 @@ import { Cascader } from 'antd';
 import styled from 'styled-components';
 import { getFilteredVersions } from '../../../app/desktop/utils';
 import { FABRIC, FORGE, QUILT, VANILLA } from '../../utils/constants';
+import state from '@loadable/babel-plugin/lib/properties/state';
 
 const NewInstance = ({ setVersion, setModpack }) => {
   const vanillaManifest = useSelector(state => state.app.vanillaManifest);
   const fabricManifest = useSelector(state => state.app.fabricManifest);
   const forgeManifest = useSelector(state => state.app.forgeManifest);
-  //const quiltManifest = useSelector(state => state.app.quiltManifest)
-  //console.log("hi")
+  const quiltManifest = useSelector(state => state.app.quiltManifest)
+
   const filteredVers = useMemo(() => {
-    return getFilteredVersions(vanillaManifest, forgeManifest, fabricManifest, /*quiltManifest*/)();
-  }, [vanillaManifest, forgeManifest, fabricManifest, /*quiltManifest*/]);
-  console.log(filteredVers)
+    return getFilteredVersions(vanillaManifest, forgeManifest, fabricManifest, quiltManifest);
+  }, [vanillaManifest, forgeManifest, fabricManifest, quiltManifest]);
+
   return (
     <Container>
       <Cascader
@@ -36,7 +37,7 @@ const NewInstance = ({ setVersion, setModpack }) => {
               loaderType: v[0],
               mcVersion: v[2],
               loaderVersion: v[3]
-            });
+            }); 
           } else if (v[0] === QUILT) {
             setVersion({
               loaderType: v[0],

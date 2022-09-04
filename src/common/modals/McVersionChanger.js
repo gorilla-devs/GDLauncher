@@ -10,25 +10,39 @@ import Modal from '../components/Modal';
 import { addToQueue } from '../reducers/actions';
 import { _getInstance } from '../utils/selectors';
 import { closeAllModals } from '../reducers/modals/actions';
-import { FABRIC, VANILLA, FORGE, CURSEFORGE, FTB } from '../utils/constants';
+import {
+  FABRIC,
+  VANILLA,
+  QUILT,
+  FORGE,
+  CURSEFORGE,
+  FTB
+} from '../utils/constants';
 import { getFilteredVersions } from '../../app/desktop/utils';
 
 const McVersionChanger = ({ instanceName, defaultValue }) => {
   const vanillaManifest = useSelector(state => state.app.vanillaManifest);
   const fabricManifest = useSelector(state => state.app.fabricManifest);
   const forgeManifest = useSelector(state => state.app.forgeManifest);
+  const quiltManifest = useSelector(state => state.app.quiltManifest);
   const config = useSelector(state => _getInstance(state)(instanceName));
   const [selectedVersion, setSelectedVersion] = useState(null);
 
   const dispatch = useDispatch();
 
   const filteredVers = useMemo(() => {
-    return getFilteredVersions(vanillaManifest, forgeManifest, fabricManifest);
-  }, [vanillaManifest, forgeManifest, fabricManifest]);
+    return getFilteredVersions(
+      vanillaManifest,
+      forgeManifest,
+      fabricManifest,
+      quiltManifest
+    );
+  }, [vanillaManifest, forgeManifest, fabricManifest, quiltManifest]);
 
   const patchedDefaultValue = useMemo(() => {
     const isFabric = defaultValue?.loaderType === FABRIC;
     const isForge = defaultValue?.loaderType === FORGE;
+    // const isQuilt = defaultValue?.loaderType === QUILT;
 
     if (isForge)
       return [
@@ -152,6 +166,7 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
               const isVanilla = selectedVersion[0] === VANILLA;
               const isFabric = selectedVersion[0] === FABRIC;
               const isForge = selectedVersion[0] === FORGE;
+              const isQuilt = selectedVersion[0] === QUILT;
 
               if (isVanilla) {
                 dispatch(
@@ -187,6 +202,20 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
                     {
                       ...defaultValue,
                       loaderType: FABRIC,
+                      mcVersion: selectedVersion[2],
+                      loaderVersion: selectedVersion[3]
+                    },
+                    null,
+                    background
+                  )
+                );
+              } else if (isQuilt) {
+                dispatch(
+                  addToQueue(
+                    instanceName,
+                    {
+                      ...defaultValue,
+                      loaderType: QUILT,
                       mcVersion: selectedVersion[2],
                       loaderVersion: selectedVersion[3]
                     },
