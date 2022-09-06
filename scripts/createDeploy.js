@@ -109,7 +109,13 @@ if (process.platform === 'win32') {
     filter: '**/*'
   });
 } else if (process.platform === 'linux') {
-  sevenZipPath = 'node_modules/7zip-bin/linux/x64/7za';
+  if (process.arch === 'arm64') {
+    sevenZipPath = 'node_modules/7zip-bin/linux/arm64/7za';
+  } else if (process.arch === 'arm') {
+    sevenZipPath = 'node_modules/7zip-bin/linux/arm/7za';
+  } else {
+    sevenZipPath = 'node_modules/7zip-bin/linux/x64/7za';
+  }
 } else if (process.platform === 'darwin') {
   sevenZipPath = 'node_modules/7zip-bin/mac/x64/7za';
 }
@@ -191,8 +197,8 @@ const commonConfig = {
   ...(process.platform === 'linux' && {
     linux:
       type === 'setup'
-        ? ['appimage:x64', 'zip:x64', 'deb:x64', 'rpm:x64']
-        : ['snap:x64']
+        ? ['appimage', 'zip', 'deb', 'rpm'].map(x => `${x}:${process.arch}`)
+        : [`snap:${process.arch}`]
   }),
   ...(process.platform === 'win32' && {
     win: [type === 'setup' ? 'nsis:x64' : 'zip:x64']
@@ -215,6 +221,13 @@ const main = async () => {
 
   const { productName } = commonConfig.config;
 
+  let linuxyml = '';
+  if (process.arch === 'x64') {
+    linuxyml = 'latest-linux.yml';
+  } else {
+    linuxyml = `latest-linux-${process.arch}.yml`;
+  }
+
   const allFiles = {
     setup: {
       darwin: [
@@ -232,7 +245,7 @@ const main = async () => {
         `${productName}-linux-${type}.AppImage`,
         `${productName}-linux-${type}.deb`,
         `${productName}-linux-${type}.rpm`,
-        'latest-linux.yml'
+        `${linuxyml}`
       ]
     },
     portable: {
