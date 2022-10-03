@@ -3185,7 +3185,7 @@ export function launchInstance(instanceName, forceQuit = false) {
     }
 
     const replaceRegex = [
-      process.platform === 'win32'
+      process.platform === 'win32' && gt(coerce(loader?.mcVersion), coerce('1.12.2'))
         ? new RegExp(userData.replace(/([.?*+^$[\]\\(){}|-])/g, '\\$1'), 'g')
         : null,
       replaceWith
