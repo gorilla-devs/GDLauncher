@@ -3265,8 +3265,30 @@ export function launchInstance(instanceName, forceQuit = false) {
     );
     dispatch(updateStartedInstance({ instanceName, pid: ps.pid }));
 
+    const parseLog4J = (inputStr) => {
+      let l4jevts = inputStr.split("<log4j:Event");
+      for (let evt of l4jevts) {
+        if (evt == "  ") continue;
+        evt = "<log4j:Event"+evt;
+        let splitQuotes = evt.split('"');
+        let logger = splitQuotes[1];
+        let level = splitQuotes[5];
+        let thread = splitQuotes[7];
+        let cdatas = inputStr.split("![CDATA[");
+        for (let str of cdatas) {
+          if (str.endsWith("><")) continue;
+          let strOnly = str.split("]]></log4j:Message")[0];
+          console.log(`[${thread}] [${logger}] [${level}] ${strOnly}`);
+        }
+      }
+    }
+    
     ps.stdout.on('data', data => {
-      console.log(data.toString());
+      if (data.toString().includes("log4j:Event")) {
+        parseLog4J(data.toString());
+      } else {
+        console.log(data.toString());
+      }
       if (
         data.toString().includes('Setting user:') ||
         data.toString().includes('Initializing LWJGL OpenAL')
