@@ -256,7 +256,7 @@ export function initNews() {
           parser.parse(newsXml)?.rss?.channel?.item?.map(newsEntry => ({
             title: newsEntry.title,
             description: newsEntry.description,
-            image: `https://minecraft.net${newsEntry.imageURL}`,
+            image: `https://www.minecraft.net${newsEntry.imageURL}`,
             url: newsEntry.link,
             guid: newsEntry.guid
           })) || [];
