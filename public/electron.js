@@ -241,7 +241,7 @@ const get7zPath = async () => {
     if (process.platform === 'win32') {
       baseDir = path.join(baseDir, '7zip-bin/win/x64');
     } else if (process.platform === 'linux') {
-      baseDir = path.join(baseDir, '7zip-bin/linux/x64');
+      baseDir = path.join(baseDir, '7zip-bin/linux', process.arch);
     } else if (process.platform === 'darwin') {
       baseDir = path.resolve(baseDir, '../../../', '7zip-bin/mac/x64');
     }

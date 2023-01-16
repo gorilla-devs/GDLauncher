@@ -15,6 +15,7 @@ import Modal from '../components/Modal';
 import { downloadFile } from '../../app/desktop/utils/downloader';
 import {
   convertOSToJavaFormat,
+  convertArchToJavaFormat,
   extractAll,
   isLatestJavaDownloaded
 } from '../../app/desktop/utils';
@@ -367,11 +368,17 @@ const AutomaticSetup = ({
 
   const installJava = async () => {
     const javaOs = convertOSToJavaFormat(process.platform);
-    const java8Meta = javaManifest.find(v => v.os === javaOs);
+    const javaArch = convertArchToJavaFormat(process.arch);
+    const java8Meta = javaManifest.find(
+      v =>
+        v.os === javaOs &&
+        v.architecture === javaArch &&
+        (v.binary_type === 'jre' || v.binary_type === 'jdk')
+    );
     const javaLatestMeta = javaLatestManifest.find(
       v =>
         v.os === javaOs &&
-        v.architecture === 'x64' &&
+        v.architecture === javaArch &&
         (v.binary_type === 'jre' || v.binary_type === 'jdk')
     );
 

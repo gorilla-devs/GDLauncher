@@ -78,7 +78,8 @@
   },
   "cpu": [
     "x64",
-    "arm64"
+    "arm64",
+    "arm"
   ],
   "browserslist": {
     "production": [
@@ -122,9 +123,9 @@
     "concurrently": "^6.2.1",
     "cross-env": "^7.0.3",
     "dotenv": "^10.0.0",
-    "electron": "^19.0.4",
-    "electron-builder": "^23.0.3",
-    "electron-updater": "^5.0.1",
+    "electron": "^19.0.5",
+    "electron-builder": "^23.0.9",
+    "electron-updater": "^5.0.4",
     "eslint": "^7.32.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^8.3.0",
@@ -152,12 +153,12 @@
     "webpack-merge": "^5.8.0"
   },
   "dependencies": {
-    "7zip-bin": "^5.1.1",
     "@loadable/babel-plugin": "^5.13.2",
     "@sentry/integrations": "^6.16.1",
     "@sentry/react": "^6.16.1",
     "@sentry/tracing": "^6.16.1",
     "@sentry/utils": "^6.16.1",
+    "7zip-bin": "^5.1.1",
     "antd": "^4.21.5",
     "axios": "^0.27.2",
     "base64-stream": "^1.0.0",
