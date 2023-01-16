@@ -7,7 +7,6 @@ const fse = require('fs-extra');
 // eslint-disable-next-line
 const webpack = require('webpack');
 const { merge } = require('webpack-merge');
-const os = require('os');
 const TerserPlugin = require('terser-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
@@ -26,7 +25,7 @@ const baseConfig = {
         test: /\.node$/,
         loader: 'native-ext-loader',
         options: {
-          basePath: ['native', os.platform()],
+          basePath: ['native'],
           emit: false
         }
       },
