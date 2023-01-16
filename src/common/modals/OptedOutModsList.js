@@ -306,10 +306,7 @@ const OptedOutModsList = ({
                 type="primary"
                 disabled={downloading}
                 onClick={() => {
-                  console.log(
-                    '>>> MATT :: OptedOutModsList :: button 1 :: click'
-                  );
-                  // TODO
+                  ipcRenderer.invoke('openMainBrowserTo', manualDownloadUrls);
                 }}
                 css={`
                   background-color: ${props => props.theme.palette.colors.blue};
@@ -321,16 +318,13 @@ const OptedOutModsList = ({
                 type="primary"
                 disabled={downloading}
                 onClick={() => {
-                  console.log(
-                    '>>> MATT :: OptedOutModsList :: button 2 :: click'
-                  );
                   ipcRenderer.invoke('openFolder', instancePath);
                 }}
                 css={`
                   background-color: ${props => props.theme.palette.colors.blue};
                 `}
               >
-                Open mods folder
+                Open folder
               </Button>
               <Button
                 type="primary"
