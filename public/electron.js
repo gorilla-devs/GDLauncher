@@ -23,8 +23,8 @@ const {
 } = require('base64url');
 const { URL } = require('url');
 const UserAgent = require('user-agents');
-const nsfw = require('./native/nsfw');
-const napi = require('./native/napi');
+const nsfw = require('./nsfw');
+const napi = require('./native/napi.node');
 
 // console.log(napi.fibonacci(10));
 

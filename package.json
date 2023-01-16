@@ -30,7 +30,7 @@
   "homepage": "./",
   "main": "build/electron.js",
   "scripts": {
-    "install": "npm run napi-build",
+    "install": "npm run napi-build && npm run nsfw-move",
     "start": "cross-env-shell NODE_ENV=development craco start",
     "start-electron": "concurrently \"npm run start\" \"wait-on http://localhost:3000 && electron .\"",
     "start-prod": "electron .",
@@ -50,7 +50,8 @@
     "upload": "node ./scripts/uploadRelease.js",
     "release": "npm run napi-build && rimraf ./deploy && npm run release:setup && npm run release:portable",
     "prepare": "husky install",
-    "napi-build": "cd napi && npm run build && node ../scripts/moveNapi.js"
+    "napi-build": "cd napi && npm run build && node ../scripts/moveNapi.js",
+    "nsfw-move": "node scripts/moveNsfw.js"
   },
   "lint-staged": {
     "*.{js,jsx}": [
@@ -139,6 +140,7 @@
     "eslint-plugin-react-hooks": "^4.3.0",
     "husky": "^7.0.4",
     "native-ext-loader": "^2.3.0",
+    "nsfw": "2.1.1",
     "prettier": "^2.5.1",
     "react-scripts": "4.0.3",
     "rimraf": "^3.0.2",

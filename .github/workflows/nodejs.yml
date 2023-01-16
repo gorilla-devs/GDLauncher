@@ -26,11 +26,10 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 1
-      - name: Use Node.js 16.13.1
+      - name: Use Node.js 16.17.0
         uses: actions/setup-node@v1
         with:
-          node-version: '16.13.1'
-
+          node-version: '16.17.0'
 
       - name: Install Nightly
         run: |
@@ -48,14 +47,12 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           rustup target add x86_64-unknown-linux-gnu --toolchain nightly
-
       - name: Switch rust to nightly
         run: |
           rustup default nightly
-
       - name: npm run install
         run: |
-          npm i
+          npm i --legacy-peer-deps
       - name: npm run lint
         run: |
           npm run lint
