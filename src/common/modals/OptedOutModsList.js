@@ -56,7 +56,13 @@ const RowContainer = styled.div`
   }
 `;
 
-const ModRow = ({ mod, loadedMods, currentMod, missingMods }) => {
+const ModRow = ({
+  mod,
+  loadedMods,
+  currentMod,
+  missingMods,
+  cloudflareBlock
+}) => {
   const { modManifest, addon } = mod;
   const loaded = loadedMods.includes(modManifest.id);
   const missing = missingMods.includes(modManifest.id);
@@ -77,8 +83,8 @@ const ModRow = ({ mod, loadedMods, currentMod, missingMods }) => {
   return (
     <RowContainer ref={ref}>
       <div>{`${addon?.name} - ${modManifest?.displayName}`}</div>
-      {loaded && !missing && <div className="dot" />}
-      {loaded && missing && (
+      {loaded && !missing && !cloudflareBlock && <div className="dot" />}
+      {loaded && (missing || cloudflareBlock) && (
         <FontAwesomeIcon
           icon={faExclamationTriangle}
           css={`
@@ -102,6 +108,8 @@ const OptedOutModsList = ({
 }) => {
   const [loadedMods, setLoadedMods] = useState([]);
   const [missingMods, setMissingMods] = useState([]);
+  const [cloudflareBlock, setCloudflareBlock] = useState(false);
+  const [manualDownloadUrls, setManualDownloadUrls] = useState([]);
   const [downloading, setDownloading] = useState(false);
 
   const dispatch = useDispatch();
@@ -135,14 +143,21 @@ const OptedOutModsList = ({
     const listener = (e, status) => {
       if (!status.error) {
         if (optedOutMods.length === loadedMods.length + 1) {
-          if (missingMods.length === 0) {
+          if (missingMods.length === 0 && !cloudflareBlock) {
             resolve();
             dispatch(closeModal());
           }
           setDownloading(false);
         }
         setLoadedMods(prev => [...prev, status.modId]);
-        if (status.warning) setMissingMods(prev => [...prev, status.modId]);
+        if (status.warning) {
+          if (!status.cloudflareBlock) {
+            setMissingMods(prev => [...prev, status.modId]);
+          } else {
+            setCloudflareBlock(true);
+            setManualDownloadUrls(prev => [...prev, status.urlDownloadPage]);
+          }
+        }
       } else {
         dispatch(closeModal());
         setTimeout(() => {
@@ -159,7 +174,7 @@ const OptedOutModsList = ({
         listener
       );
     };
-  }, [loadedMods, missingMods]);
+  }, [loadedMods, missingMods, cloudflareBlock, manualDownloadUrls]);
 
   return (
     <Modal
@@ -197,9 +212,22 @@ const OptedOutModsList = ({
                 loadedMods={loadedMods}
                 currentMod={currentMod}
                 missingMods={missingMods}
+                cloudflareBlock={cloudflareBlock}
               />
             ))}
         </ModsContainer>
+        {cloudflareBlock && (
+          <p
+            css={`
+              width: 80%;
+              margin: 20px auto 0 auto;
+            `}
+          >
+            Cloudflare is currently blocking automated downloads. You can
+            manually download the mods and place them in the mods folder if you
+            want.
+          </p>
+        )}
         <div
           css={`
             display: flex;
@@ -224,7 +252,7 @@ const OptedOutModsList = ({
           >
             Cancel
           </Button>
-          {missingMods.length === 0 && (
+          {missingMods.length === 0 && !cloudflareBlock && (
             <Button
               type="primary"
               disabled={downloading}
@@ -257,7 +285,7 @@ const OptedOutModsList = ({
               Confirm
             </Button>
           )}
-          {missingMods.length > 0 && (
+          {missingMods.length > 0 && !cloudflareBlock && (
             <Button
               type="primary"
               disabled={downloading}
@@ -271,6 +299,54 @@ const OptedOutModsList = ({
             >
               Continue
             </Button>
+          )}
+          {cloudflareBlock && (
+            <>
+              <Button
+                type="primary"
+                disabled={downloading}
+                onClick={() => {
+                  console.log(
+                    '>>> MATT :: OptedOutModsList :: button 1 :: click'
+                  );
+                  // TODO
+                }}
+                css={`
+                  background-color: ${props => props.theme.palette.colors.blue};
+                `}
+              >
+                Open Browser
+              </Button>
+              <Button
+                type="primary"
+                disabled={downloading}
+                onClick={() => {
+                  console.log(
+                    '>>> MATT :: OptedOutModsList :: button 2 :: click'
+                  );
+                  ipcRenderer.invoke('openFolder', instancePath);
+                }}
+                css={`
+                  background-color: ${props => props.theme.palette.colors.blue};
+                `}
+              >
+                Open mods folder
+              </Button>
+              <Button
+                type="primary"
+                disabled={downloading}
+                onClick={() => {
+                  resolve();
+                  dispatch(closeModal());
+                }}
+                css={`
+                  background-color: ${props =>
+                    props.theme.palette.colors.green};
+                `}
+              >
+                Continue
+              </Button>
+            </>
           )}
         </div>
       </Container>
