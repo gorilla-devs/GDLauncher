@@ -84,7 +84,7 @@ export const convertOSToJavaFormat = ElectronFormat => {
 export const convertArchToJavaFormat = ElectronFormat => {
   switch (ElectronFormat) {
     case 'x64':
-      return 'amd64';
+      return 'x64';
     case 'ia32':
       return 'x32';
     case 'arm':
