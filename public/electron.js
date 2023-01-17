@@ -943,7 +943,7 @@ ipcMain.handle('installUpdateAndQuitOrRestart', async (e, quitAfterInstall) => {
 
     await fs.writeFile(
       path.join(tempFolder, updaterVbs),
-      `Set WshShell = CreateObject("WScript.Shell")
+      `Set WshShell = CreateObject("WScript.Shell") 
           WshShell.Run chr(34) & "${path.join(
             tempFolder,
             updaterBat
