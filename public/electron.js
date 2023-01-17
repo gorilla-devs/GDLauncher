@@ -582,20 +582,6 @@ ipcMain.handle('openFolder', (e, folderPath) => {
   shell.openPath(folderPath);
 });
 
-ipcMain.handle('openMainBrowserTo', (e, urls) => {
-  let start;
-  if (process.platform === 'darwin') {
-    start = 'open';
-  } else if (process.platform === 'win32') {
-    start = 'start';
-  } else {
-    start = 'xdg-open';
-  }
-  for (const url of urls) {
-    exec(`${start} ${url}`);
-  }
-});
-
 ipcMain.handle('open-devtools', () => {
   mainWindow.webContents.openDevTools({ mode: 'undocked' });
 });
@@ -805,8 +791,7 @@ ipcMain.handle('download-optedout-mods', async (e, { mods, instancePath }) => {
                 modId: modManifest.id,
                 error: false,
                 warning: true,
-                cloudflareBlock: true,
-                urlDownloadPage
+                cloudflareBlock: true
               });
             }
           }
