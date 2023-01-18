@@ -141,7 +141,7 @@
     "eslint-plugin-react-hooks": "^4.3.0",
     "husky": "^7.0.4",
     "native-ext-loader": "^2.3.0",
-    "nsfw": "2.1.1",
+    "nsfw": "^2.2.4",
     "prettier": "^2.5.1",
     "react-scripts": "4.0.3",
     "rimraf": "^3.0.2",
