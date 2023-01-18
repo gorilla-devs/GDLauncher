@@ -51,7 +51,7 @@
     "release": "npm run napi-build && rimraf ./deploy && npm run release:setup && npm run release:portable",
     "prepare": "husky install",
     "napi-build": "cd napi && npm run build && node ../scripts/moveNapi.js",
-    "nsfw-move": "npm install --prefix node_modules/nsfw && node scripts/moveNsfw.js"
+    "nsfw-move": "cd node_modules/nsfw && npm install && node scripts/moveNsfw.js"
   },
   "lint-staged": {
     "*.{js,jsx}": [
