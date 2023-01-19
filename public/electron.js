@@ -784,6 +784,51 @@ ipcMain.handle('download-optedout-mods', async (e, { mods, instancePath }) => {
                 error: false,
                 warning: true
               });
+            } else if (details.statusCode > 400) {
+              /**
+               * Check for Cloudflare blocking automated downloads.
+               *
+               * Sometimes, Cloudflare prevents the internal browser from navigating to the
+               * Curseforge mod download page and starting the download. The HTTP status code
+               * it returns is (generally) either 403 or 503. The code below retrieves the
+               * HTML of the page returned to the browser and checks for the title and some
+               * content on the page to determine if the returned page is Cloudflare.
+               * Unfortunately using the `webContents.getTitle()` returns an empty string.
+               */
+              details.webContents
+                .executeJavaScript(
+                  `
+                    function getHTML () {
+                      return new Promise((resolve, reject) => { resolve(document.documentElement.innerHTML); });
+                    }
+                    getHTML();
+                  `
+                )
+                .then(content => {
+                  const isCloudflare =
+                    content.includes('Just a moment...') &&
+                    content.includes(
+                      'needs to review the security of your connection before proceeding.'
+                    );
+
+                  if (isCloudflare) {
+                    resolve();
+                    mainWindow.webContents.send(
+                      'opted-out-download-mod-status',
+                      {
+                        modId: modManifest.id,
+                        error: false,
+                        warning: true,
+                        cloudflareBlock: true
+                      }
+                    );
+                  }
+
+                  return null;
+                })
+                .catch(() => {
+                  // no-op
+                });
             }
           }
         );
@@ -934,7 +979,7 @@ ipcMain.handle('installUpdateAndQuitOrRestart', async (e, quitAfterInstall) => {
 
     await fs.writeFile(
       path.join(tempFolder, updaterVbs),
-      `Set WshShell = CreateObject("WScript.Shell") 
+      `Set WshShell = CreateObject("WScript.Shell")
           WshShell.Run chr(34) & "${path.join(
             tempFolder,
             updaterBat
