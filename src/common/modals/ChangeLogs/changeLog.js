@@ -1,31 +1,34 @@
 module.exports = {
-  new: [],
-  improvements: [],
+  new: [
+    {
+      header: 'Support ARM',
+      content: 'Architecture.',
+      advanced: { cm: '4fd9a4', pr: '1451' }
+    },
+    {
+      header: 'Add manual download',
+      content: 'option for failed opted out mods.',
+      advanced: { cm: 'a8dfa1', pr: '1512' }
+    }
+  ],
+  improvements: [
+    {
+      header: 'Updated url',
+      content: 'for minecraft news images.',
+      advanced: { cm: 'efa324', pr: '1443' }
+    },
+    {
+      header: 'Simplifications',
+      content:
+        ' to the codebase, napi and nsfw now get automatically compiled on build.',
+      advanced: { cm: '20148d', pr: '1446' }
+    }
+  ],
   bugfixes: [
     {
-      header: 'No longer killing the game',
-      content: 'when closing the Launcher.',
-      advanced: { cm: '391dd9cc', pr: '1412' }
-    },
-    {
-      header: 'Fixed the game resolution setting',
-      content: 'being ignored.',
-      advanced: { cm: '87f89ed9', pr: '1429' }
-    },
-    {
-      header: 'Fixed the kill button',
-      content: 'having to be clicked twice.',
-      advanced: { cm: '2664f8bb', pr: '1419' }
-    },
-    {
-      header: 'Fixed error code one ',
-      content: 'when certain java args are missing.',
-      advanced: { cm: 'cdae501a', pr: '1420' }
-    },
-    {
-      header: 'Fixed settings resetting',
-      content: 'caused by the CurseForge workaround.',
-      advanced: { cm: '7f29ca64', pr: '1431' }
+      header: 'Fix asset downloading',
+      content: 'now enforcing https.',
+      advanced: { cm: '73b3f4', pr: '1514' }
     }
   ]
 };

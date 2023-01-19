@@ -81,6 +81,21 @@ export const convertOSToJavaFormat = ElectronFormat => {
   }
 };
 
+export const convertArchToJavaFormat = ElectronFormat => {
+  switch (ElectronFormat) {
+    case 'x64':
+      return 'x64';
+    case 'ia32':
+      return 'x32';
+    case 'arm':
+      return 'arm';
+    case 'arm64':
+      return 'aarch64';
+    default:
+      return false;
+  }
+};
+
 export const skipLibrary = lib => {
   let skip = false;
   if (lib.rules) {
@@ -321,6 +336,7 @@ export const isLatestJavaDownloaded = async (
   version = 8
 ) => {
   const javaOs = convertOSToJavaFormat(process.platform);
+  const javaArch = convertArchToJavaFormat(process.arch);
   let log = null;
 
   const isJavaLatest = version === LATEST_JAVA_VERSION;
@@ -330,7 +346,7 @@ export const isLatestJavaDownloaded = async (
   const javaMeta = manifest.find(
     v =>
       v.os === javaOs &&
-      v.architecture === 'x64' &&
+      v.architecture === javaArch &&
       (v.binary_type === 'jre' || v.binary_type === 'jdk')
   );
   const javaFolder = path.join(
