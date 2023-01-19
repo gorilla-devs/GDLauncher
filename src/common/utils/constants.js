@@ -1,5 +1,3 @@
-export const MC_MANIFEST_URL =
-  'https://launchermeta.mojang.com/mc/game/version_manifest.json';
 export const MC_RESOURCES_URL = 'https://resources.download.minecraft.net';
 export const FABRIC_APIS = 'https://meta.fabricmc.net/v2';
 export const GDL_LEGACYJAVAFIXER_MOD_URL =
