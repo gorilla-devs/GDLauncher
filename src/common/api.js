@@ -4,7 +4,6 @@ import qs from 'querystring';
 import {
   MOJANG_APIS,
   FORGESVC_URL,
-  MC_MANIFEST_URL,
   FABRIC_APIS,
   JAVA_MANIFEST_URL,
   IMGUR_CLIENT_ID,
@@ -15,7 +14,7 @@ import {
   FTB_API_URL,
   JAVA_LATEST_MANIFEST_URL
 } from './utils/constants';
-import { sortByDate } from './utils';
+import { sortByDate, getMcManifestUrl } from './utils';
 import ga from './utils/analytics';
 
 const axioInstance = axios.create({
@@ -198,7 +197,7 @@ export const mcInvalidate = (accessToken, clientToken) => {
 };
 
 export const getMcManifest = () => {
-  const url = `${MC_MANIFEST_URL}?timestamp=${new Date().getTime()}`;
+  const url = `${getMcManifestUrl()}?timestamp=${new Date().getTime()}`;
   return axios.get(url);
 };
 
