@@ -304,3 +304,16 @@ export const replaceLibraryDirectory = (arg, librariesDir) => {
       splittedString.join('${classpath_separator}')
     : arg;
 };
+
+export const getMcManifestUrl = () => {
+  switch (process.arch) {
+    case 'x64':
+      return 'https://launchermeta.mojang.com/mc/game/version_manifest.json';
+    case 'arm':
+      return 'https://raw.githubusercontent.com/theofficialgman/piston-meta-arm32/main/mc/game/version_manifest.json';
+    case 'arm64':
+      return 'https://raw.githubusercontent.com/theofficialgman/piston-meta-arm64/main/mc/game/version_manifest.json';
+    default:
+      throw new Error(`Device architecture ${process.arch} not supported.`);
+  }
+};
