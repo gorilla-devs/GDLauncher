@@ -232,7 +232,7 @@ export const makeInstanceRestorePoint = async (
     await access(newInstancePath);
     await remove(newInstancePath);
   } catch (e) {
-    console.warn(e);
+    console.log('Expected ENOENT:', e);
   }
   await makeDir(newInstancePath);
   try {
