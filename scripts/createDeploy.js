@@ -77,6 +77,7 @@ const createDeployFiles = async () => {
           if (err) {
             reject();
           }
+          destination.close();
           resolve();
         });
       });

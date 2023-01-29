@@ -22,6 +22,11 @@ module.exports = {
       content:
         ' to the codebase, napi and nsfw now get automatically compiled on build.',
       advanced: { cm: '20148d', pr: '1446' }
+    },
+    {
+      header: 'Add restore option',
+      content: 'to failed updates.',
+      advanced: { cm: '9d84085', pr: '1531' }
     }
   ],
   bugfixes: [
@@ -29,6 +34,11 @@ module.exports = {
       header: 'Fix asset downloading',
       content: 'now enforcing https.',
       advanced: { cm: '73b3f4', pr: '1514' }
+    },
+    {
+      header: 'Fix deprecated warnings',
+      content: 'for dropped file handles.',
+      advanced: { cm: '9d84085', pr: '1531' }
     }
   ]
 };
