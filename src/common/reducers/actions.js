@@ -1068,6 +1068,7 @@ export function updateInstanceConfig(
         if (readBuff.every(v => v === 0)) {
           throw new Error('Corrupted file');
         }
+        newFile.close();
         await fs.rename(tempP, p);
       };
 
@@ -2704,12 +2705,15 @@ export const startListener = () => {
             !changesTracker[completePath].completed &&
             (event.action === 2 || event.action === 0 || event.action === 1)
           ) {
+            let filehandle;
             try {
               await new Promise(resolve => setTimeout(resolve, 300));
-              await fs.open(completePath, 'r+');
+              filehandle = await fs.open(completePath, 'r+');
               changesTracker[completePath].completed = true;
             } catch {
               // Do nothing, simply not completed..
+            } finally {
+              await filehandle?.close();
             }
           }
         })
@@ -3762,6 +3766,7 @@ export const checkForPortableUpdates = () => {
                   if (err) {
                     reject(err);
                   }
+                  destination.close();
                   resolve();
                 });
               });
