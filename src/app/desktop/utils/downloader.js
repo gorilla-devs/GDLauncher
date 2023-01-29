@@ -103,8 +103,10 @@ const downloadFileInstance = async (fileName, url, sha1, legacyPath) => {
 
       data.on('end', () => {
         wStream.end();
+        wStream.close();
         if (legacyPath) {
           wStreamLegacy.end();
+          wStreamLegacy.close();
         }
         resolve();
       });
@@ -148,6 +150,7 @@ export const downloadFile = async (fileName, url, onProgress) => {
   return new Promise((resolve, reject) => {
     data.on('end', () => {
       out.end();
+      out.close();
       resolve();
     });
 
