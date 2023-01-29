@@ -2233,6 +2233,7 @@ export function downloadInstance(instanceName) {
 
       await dispatch(removeDownloadFromQueue(instanceName));
       dispatch(addNextInstanceToCurrentDownload());
+      await remove(tempInstancePath);
     } catch (err) {
       console.error(err);
       // Show error modal and decide what to do
@@ -2244,8 +2245,6 @@ export function downloadInstance(instanceName) {
           isUpdate
         })
       );
-    } finally {
-      await remove(tempInstancePath);
     }
   };
 }

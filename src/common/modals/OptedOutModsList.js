@@ -202,17 +202,19 @@ const OptedOutModsList = ({
       title="Opted out mods list"
     >
       <Container>
-        <div
-          css={`
-            text-align: left;
-            margin-bottom: 2rem;
-          `}
-        >
-          Hey oh! It looks like some developers opted out from showing their
-          mods on third-party launchers. We can still attempt to download them
-          automatically. Please click continue and wait for all downloads to
-          finish. Please don&apos;t click anything inside the browser.
-        </div>
+        {!cloudflareBlock && (
+          <div
+            css={`
+              text-align: left;
+              margin-bottom: 2rem;
+            `}
+          >
+            Hey oh! It looks like some developers opted out from showing their
+            mods on third-party launchers. We can still attempt to download them
+            automatically. Please click continue and wait for all downloads to
+            finish. Please don&apos;t click anything inside the browser.
+          </div>
+        )}
         <ModsContainer>
           {optedOutMods &&
             optedOutMods.map(mod => {
@@ -231,7 +233,6 @@ const OptedOutModsList = ({
         {cloudflareBlock && (
           <p
             css={`
-              width: 90%;
               margin: 20px auto 0 auto;
             `}
           >
@@ -254,7 +255,9 @@ const OptedOutModsList = ({
           <Button
             danger
             type="text"
-            disabled={downloading || loadedMods.length !== 0}
+            disabled={
+              (missingMods.length > 0 && !cloudflareBlock) || downloading
+            }
             onClick={() => {
               dispatch(closeModal());
               setTimeout(
@@ -290,6 +293,7 @@ const OptedOutModsList = ({
                   mods: optedOutMods,
                   instancePath
                 });
+                setDownloading(false);
               }}
               css={`
                 background-color: ${props => props.theme.palette.colors.green};
