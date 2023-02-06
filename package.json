@@ -122,7 +122,7 @@
     "babel-preset-minify": "^0.5.2",
     "concurrently": "^7.6.0",
     "cross-env": "^7.0.3",
-    "dotenv": "^10.0.0",
+    "dotenv": "^16.0.3",
     "electron": "^19.0.5",
     "electron-builder": "^23.0.9",
     "electron-updater": "^5.0.4",
