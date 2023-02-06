@@ -88,9 +88,7 @@ module.exports = merge(baseConfig, {
   optimization: {
     minimizer: [
       new TerserPlugin({
-        parallel: true,
-        sourceMap: true,
-        cache: true
+        parallel: true
       })
     ]
   },

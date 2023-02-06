@@ -145,7 +145,7 @@
     "prettier": "^2.8.3",
     "react-scripts": "4.0.3",
     "rimraf": "^3.0.2",
-    "terser-webpack-plugin": "^4.1.0",
+    "terser-webpack-plugin": "^5.3.6",
     "wait-on": "^6.0.1",
     "webpack": "^4.46.0",
     "webpack-bundle-analyzer": "^4.7.0",
