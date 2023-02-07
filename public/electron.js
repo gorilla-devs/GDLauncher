@@ -371,7 +371,7 @@ function createWindow() {
   mainWindow.loadURL(
     isDev
       ? 'http://localhost:8080'
-      : `file://${path.join(__dirname, '../build/web/index.html')}`,
+      : `file://${path.join(__dirname, '../../build/web/index.html')}`,
     {
       userAgent: 'GDLauncher'
     }
