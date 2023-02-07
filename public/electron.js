@@ -317,7 +317,7 @@ function createWindow() {
       if (details.url.includes('www.google-analytics.com')) {
         // eslint-disable-next-line
         details.responseHeaders['Access-Control-Allow-Origin'] = [
-          'http://localhost:3000'
+          'http://localhost:8080'
         ];
       } else {
         // eslint-disable-next-line
@@ -370,8 +370,8 @@ function createWindow() {
 
   mainWindow.loadURL(
     isDev
-      ? 'http://localhost:3000'
-      : `file://${path.join(__dirname, '../build/index.html')}`,
+      ? 'http://localhost:8080'
+      : `file://${path.join(__dirname, '../build/web/index.html')}`,
     {
       userAgent: 'GDLauncher'
     }

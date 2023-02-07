@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/icon.ico" />
+    <link rel="icon" href="icon.ico" />
     <meta
       name="description"
       content="GDLauncher -- A custom Minecraft launcher"
@@ -50,103 +50,7 @@
       }
       /* @keyframes spin { 100% {  transform:rotate(360deg); } } */
     </style>
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <script>
-      (function () {
-        if (process.env.NODE_ENV !== 'development') {
-          window.gaInitialized = true;
-          window.ga =
-            window.ga ||
-            function () {
-              (ga.q = ga.q || []).push(arguments);
-            };
-          ga.l = +new Date();
-          ga('create', 'UA-147631204-1', 'none');
-          ga('set', 'transport', 'xhr');
-          ga('set', 'appName', 'GDLauncher');
-          ga('set', 'checkProtocolTask', null);
-          ga('set', 'checkStorageTask', null);
-          ga('set', 'storage', 'none');
-          ga('set', 'storeGac', null);
-          ga('set', 'anonymizeIp', true);
-          ga('set', 'ds', 'app');
-        }
-      })();
-    </script>
-
-    <script>
-      !(function () {
-        'use strict';
-        var i = {};
-        var a = window.location,
-          r = window.document,
-          o = r.currentScript,
-          l =
-            o.getAttribute('data-api') || 'https://plausible.io' + '/api/event';
-        function s(e) {
-          console.warn('Ignoring Event: ' + e);
-        }
-        function e(e, t) {
-          if (
-            /^localhost$|^127(\.[0-9]+){0,2}\.[0-9]+$|^\[::1?\]$/.test(
-              a.hostname
-            )
-          )
-            return s('localhost');
-          if (
-            !(
-              window._phantom ||
-              window.__nightmare ||
-              window.navigator.webdriver ||
-              window.Cypress
-            )
-          ) {
-            try {
-              if ('true' === window.localStorage.plausible_ignore)
-                return s('localStorage flag');
-            } catch (e) {}
-            (i.n = e),
-              (i.d = 'app.gdevs.io'),
-              (i.r = 'https://app.gdevs.io'),
-              (i.w = window.innerWidth),
-              t && t.meta && (i.m = JSON.stringify(t.meta)),
-              t && t.props && (i.p = t.props),
-              (i.h = 1);
-            var n = new XMLHttpRequest();
-            n.open('POST', l, !0),
-              n.setRequestHeader('Content-Type', 'text/plain'),
-              n.send(JSON.stringify(i)),
-              (n.onreadystatechange = function () {
-                4 === n.readyState && t && t.callback && t.callback();
-              });
-          }
-        }
-        var t = (window.plausible && window.plausible.q) || [];
-        window.plausible = e;
-        for (var i, n = 0; n < t.length; n++) e.apply(this, t[n]);
-        function w() {
-          (i.u = 'https://app.gdevs.io' + a.hash.slice(1)),
-            e('pageview', { props: { version: '1.1.29' } });
-        }
-        window.addEventListener('hashchange', w),
-          'prerender' === r.visibilityState
-            ? r.addEventListener('visibilitychange', function () {
-                i || 'visible' !== r.visibilityState || w();
-              })
-            : w();
-      })();
-    </script>
-
-    <script async src="https://www.google-analytics.com/analytics.js"></script>
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
-
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
+    <link rel="manifest" href="manifest.json" />
     <title>GDLauncher</title>
   </head>
   <body>
