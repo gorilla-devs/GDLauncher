@@ -35,6 +35,7 @@ let tray;
 let watcher;
 
 const discordRPC = require('./discordRPC');
+const { downloadInstanceFiles, downloadFile } = require('./downloadFile');
 
 const gotTheLock = app.requestSingleInstanceLock();
 
@@ -899,6 +900,24 @@ ipcMain.handle('download-optedout-mods', async (e, { mods, instancePath }) => {
       win = null;
     });
   }
+});
+
+ipcMain.handle(
+  'download-instance-files',
+  async (e, arr, updatePercentage, threads) => {
+    const back = downloadInstanceFiles(
+      mainWindow,
+      arr,
+      updatePercentage,
+      threads
+    );
+    log.log('Back:', back);
+    return back;
+  }
+);
+
+ipcMain.handle('download-file', async (e, fileName, url, onProgress) => {
+  return downloadFile(mainWindow, fileName, url, onProgress);
 });
 
 ipcMain.handle('start-listener', async (e, dirPath) => {

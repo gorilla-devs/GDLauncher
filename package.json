@@ -37,7 +37,7 @@
     "lint": "eslint .",
     "napi-build": "cd napi && npm run build && node ../scripts/moveNapi.js",
     "nsfw-build": "cd node_modules/nsfw && node-gyp build  && cd ../.. && node scripts/moveNsfw.js",
-    "start-electron:dev": "cross-env-shell NODE_ENV=development APP_TYPE=electron BROWSER=none wait-on http://localhost:8080 -i 2000 && electron .",
+    "start-electron:dev": "cross-env-shell NODE_ENV=development APP_TYPE=electron wait-on http://localhost:8080 -i 2000 && electron .",
     "start-electron:prod": "electron .",
     "start-web:dev": "cross-env-shell REACT_APP_RELEASE_TYPE=setup webpack serve --hot --mode development",
     "build-web:setup": "cross-env-shell REACT_APP_RELEASE_TYPE=setup webpack --mode production",

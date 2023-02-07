@@ -140,6 +140,9 @@ const config = {
         parallel: true
       })
     ]
+  },
+  resolve: {
+    mainFields: ['module', 'main']
   }
 };
 
