@@ -4,19 +4,13 @@ import { Select, Button } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import ReactHtmlParser from 'react-html-parser';
 import path from 'path';
-import {
-  getAddonFiles,
-  getAddonFileChangelog,
-  getFTBModpackData,
-  getFTBChangelog,
-  getFTBModpackVersionData
-} from '../../api';
+import { getAddonFiles, getAddonFileChangelog } from '../../api';
 import { changeModpackVersion } from '../../reducers/actions';
 import { closeModal } from '../../reducers/modals/actions';
 import { _getInstancesPath, _getTempPath } from '../../utils/selectors';
 import { makeInstanceRestorePoint } from '../../utils';
 
-const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
+const Modpack = ({ modpackId, instanceName, manifest }) => {
   const [files, setFiles] = useState([]);
   const [versionName, setVersionName] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(null);
@@ -25,17 +19,6 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
   const dispatch = useDispatch();
   const tempPath = useSelector(_getTempPath);
   const instancesPath = useSelector(_getInstancesPath);
-
-  const convertFtbReleaseType = type => {
-    switch (type) {
-      case 'Release':
-        return 1;
-      case 'Beta':
-        return 2;
-      default:
-        return 3;
-    }
-  };
 
   const initData = async () => {
     setLoading(true);
@@ -52,36 +35,6 @@ const Modpack = ({ modpackId, instanceName, manifest, fileID }) => {
         })
       );
       setFiles(mappedFiles);
-    } else {
-      const ftbModpack = await getFTBModpackData(modpackId);
-
-      setVersionName(
-        `${ftbModpack.name} - ${
-          ftbModpack.versions.find(modpack => modpack.id === fileID).name
-        }`
-      );
-
-      const mappedVersions = await Promise.all(
-        ftbModpack.versions.map(async version => {
-          const changelog = await getFTBChangelog(modpackId, version.id);
-          const newModpack = await getFTBModpackVersionData(
-            modpackId,
-            version.id
-          );
-
-          return {
-            displayName: `${ftbModpack.name} ${version.name}`,
-            id: version.id,
-            gameVersions: [newModpack.targets[1]?.version],
-            releaseType: convertFtbReleaseType(version.type),
-            fileDate: version.updated * 1000,
-            imageUrl: ftbModpack.art[0].url,
-            changelog: changelog.content
-          };
-        })
-      );
-
-      setFiles(mappedVersions);
     }
     setLoading(false);
   };
