@@ -10,7 +10,7 @@ import Modal from '../components/Modal';
 import { addToQueue } from '../reducers/actions';
 import { _getInstance } from '../utils/selectors';
 import { closeAllModals } from '../reducers/modals/actions';
-import { FABRIC, VANILLA, FORGE, CURSEFORGE, FTB } from '../utils/constants';
+import { FABRIC, VANILLA, FORGE, CURSEFORGE } from '../utils/constants';
 import { getFilteredVersions } from '../../app/desktop/utils';
 
 const McVersionChanger = ({ instanceName, defaultValue }) => {
@@ -67,8 +67,7 @@ const McVersionChanger = ({ instanceName, defaultValue }) => {
       <Container>
         {selectedVersion &&
           selectedVersion[0] !== patchedDefaultValue[0] &&
-          (defaultValue?.source === CURSEFORGE ||
-            defaultValue?.source === FTB) && (
+          defaultValue?.source === CURSEFORGE && (
             <div
               css={`
                 color: ${props => props.theme.palette.colors.yellow};

@@ -24,8 +24,7 @@ import {
 import { _getInstancesPath, _getTempPath } from '../../utils/selectors';
 import bgImage from '../../assets/mcCube.jpg';
 import { downloadFile } from '../../../app/desktop/utils/downloader';
-import { FABRIC, VANILLA, FORGE, FTB, CURSEFORGE } from '../../utils/constants';
-import { getFTBModpackVersionData } from '../../api';
+import { FABRIC, VANILLA, FORGE, CURSEFORGE } from '../../utils/constants';
 
 const InstanceName = ({
   in: inProp,
@@ -80,13 +79,6 @@ const InstanceName = ({
     // Curseforge
     if (!modpack.synopsis) {
       return modpack?.logo?.thumbnailUrl;
-    } else {
-      // FTB
-      const image = modpack?.art?.reduce((prev, curr) => {
-        if (!prev || curr.size < prev.size) return curr;
-        return prev;
-      });
-      return image.url;
     }
   }, [modpack]);
 
@@ -102,7 +94,6 @@ const InstanceName = ({
     const initTimestamp = Date.now();
 
     const isCurseForgeModpack = Boolean(version?.source === CURSEFORGE);
-    const isFTBModpack = Boolean(modpack?.art);
     let manifest;
 
     // If it's a curseforge modpack grab the manfiest and detect the loader
@@ -215,79 +206,6 @@ const InstanceName = ({
           )
         );
       }
-    } else if (isFTBModpack) {
-      // Fetch mc version
-
-      const data = await getFTBModpackVersionData(
-        version?.projectID,
-        version?.fileID
-      );
-
-      const forgeModloader = data.targets.find(v => v.type === 'modloader');
-      const mcVersion = data.targets.find(v => v.type === 'game').version;
-      const loader = {
-        loaderType: forgeModloader?.name,
-        mcVersion,
-        loaderVersion:
-          data.targets[0].name === FABRIC
-            ? forgeModloader?.version
-            : convertcurseForgeToCanonical(
-                forgeModloader?.version,
-                mcVersion,
-                forgeManifest
-              ),
-        fileID: version?.fileID,
-        projectID: version?.projectID,
-        source: FTB,
-        sourceName: originalMcName
-      };
-
-      let ramAmount = null;
-
-      const userMemory = Math.round(os.totalmem() / 1024 / 1024);
-
-      if (userMemory < data?.specs?.minimum) {
-        try {
-          await new Promise((resolve, reject) => {
-            dispatch(
-              openModal('ActionConfirmation', {
-                message: `At least ${data?.specs?.minimum}MB of RAM are required to play this modpack and you only have ${userMemory}MB. You might still be able to play it but probably with low performance. Do you want to continue?`,
-                confirmCallback: () => resolve(),
-                abortCallback: () => reject(),
-                title: 'Low Memory Warning'
-              })
-            );
-          });
-        } catch {
-          setClicked(false);
-          return;
-        }
-      }
-      if (userMemory >= data?.specs?.recommended) {
-        ramAmount = data?.specs?.recommended;
-      } else if (userMemory >= data?.specs?.minimum) {
-        ramAmount = data?.specs?.minimum;
-      }
-
-      await downloadFile(
-        path.join(
-          instancesPath,
-          localInstanceName,
-          `background${path.extname(imageURL)}`
-        ),
-        imageURL
-      );
-
-      dispatch(
-        addToQueue(
-          localInstanceName,
-          loader,
-          data,
-          `background${path.extname(imageURL)}`,
-          null,
-          ramAmount ? { javaMemory: ramAmount } : null
-        )
-      );
     } else if (importZipPath) {
       manifest = await importAddonZip(
         importZipPath,

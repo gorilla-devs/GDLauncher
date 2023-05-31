@@ -13,7 +13,7 @@ import { transparentize } from 'polished';
 import { getAddonDescription, getAddonFiles } from '../api';
 import CloseButton from '../components/CloseButton';
 import { closeModal, openModal } from '../reducers/modals/actions';
-import { FORGE, CURSEFORGE_URL, FTB_MODPACK_URL } from '../utils/constants';
+import { FORGE, CURSEFORGE_URL } from '../utils/constants';
 import { formatNumber, formatDate } from '../utils';
 
 const ModpackDescription = ({
@@ -48,10 +48,6 @@ const ModpackDescription = ({
             setLoading(false);
           })
         ]);
-      } else if (type === 'ftb') {
-        setDescription(modpack.description);
-        setFiles(modpack.versions.slice().reverse());
-        setLoading(false);
       }
     };
     init();
@@ -98,24 +94,9 @@ const ModpackDescription = ({
     }
   };
 
-  const parseLink = string => {
-    const newName = string
-      .replace(/\+/, 'plus')
-      .replace(/-+/, 'minus')
-      .replace(/[^0-9a-z]/gi, '_')
-      .replace(/_+/, '_');
-    return `${FTB_MODPACK_URL}/${newName}`;
-  };
-
   const primaryImage = useMemo(() => {
     if (type === 'curseforge') {
       return modpack.logo.thumbnailUrl;
-    } else if (type === 'ftb') {
-      const image = modpack.art.reduce((prev, curr) => {
-        if (!prev || curr.size < prev.size) return curr;
-        return prev;
-      });
-      return image.url;
     }
   }, [modpack, type]);
 
@@ -144,28 +125,19 @@ const ModpackDescription = ({
                   </div>
                   <div>
                     <label>Downloads: </label>
-                    {type === 'ftb'
-                      ? formatNumber(modpack.installs)
-                      : formatNumber(modpack.downloadCount)}
+                    {formatNumber(modpack.downloadCount)}
                   </div>
                   <div>
                     <label>Last Update: </label>
-                    {type === 'ftb'
-                      ? formatDate(modpack.refreshed * 1000)
-                      : formatDate(modpack.dateModified)}
+                    {formatDate(modpack.dateModified)}
                   </div>
                   <div>
                     <label>MC version: </label>
-                    {type === 'ftb'
-                      ? modpack.tags[0]?.name || '-'
-                      : modpack.latestFilesIndexes[0].gameVersion}
+                    {modpack.latestFilesIndexes[0].gameVersion}
                   </div>
                 </ParallaxContentInfos>
                 <Button
-                  href={
-                    type === 'ftb'
-                      ? parseLink(modpack.name)
-                      : modpack.websiteUrl
+                  href={modpack.websiteUrl
                   }
                   css={`
                     position: absolute;
@@ -209,11 +181,7 @@ const ModpackDescription = ({
             </ParallaxContent>
           </Parallax>
           <Content>
-            {type === 'ftb' ? (
-              <ReactMarkdown>{description}</ReactMarkdown>
-            ) : (
-              ReactHtmlParser(description)
-            )}
+            {ReactHtmlParser(description)}
           </Content>
         </Container>
         <Footer>
@@ -235,11 +203,7 @@ const ModpackDescription = ({
             >
               {(files || []).map(file => (
                 <Select.Option
-                  title={
-                    type === 'ftb'
-                      ? `${modpack.name} - ${file.name}`
-                      : file.displayName
-                  }
+                  title={file.displayName}
                   key={file.id}
                   value={file.id}
                 >
@@ -256,9 +220,7 @@ const ModpackDescription = ({
                         align-items: center;
                       `}
                     >
-                      {type === 'ftb'
-                        ? `${modpack.name} - ${file.name}`
-                        : file.displayName}
+                      {file.displayName}
                     </div>
                     <div
                       css={`
@@ -269,14 +231,10 @@ const ModpackDescription = ({
                       `}
                     >
                       <div>
-                        {type === 'ftb'
-                          ? modpack.tags[0]?.name || '-'
-                          : file.gameVersions[0]}
+                        {file.gameVersions[0]}
                       </div>
                       <div>
-                        {getReleaseType(
-                          type === 'ftb' ? file.type : file.releaseType
-                        )}
+                        {getReleaseType(file.releaseType)}
                       </div>
                     </div>
                     <div
@@ -287,9 +245,7 @@ const ModpackDescription = ({
                       `}
                     >
                       <div>
-                        {new Date(
-                          type === 'ftb' ? file.updated * 1000 : file.fileDate
-                        ).toLocaleDateString(undefined, {
+                        {new Date(file.fileDate).toLocaleDateString(undefined, {
                           year: 'numeric',
                           month: 'long',
                           day: 'numeric'
