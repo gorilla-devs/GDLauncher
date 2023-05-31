@@ -38,7 +38,7 @@ const getInstances = async instancesPath => {
 
       // if the launcher has the modloader as an array, convert it to object
       if (Array.isArray(config.modloader)) {
-        // source is the source where the modpack comes from example: ftb
+        // source is the source where the modpack comes from example: curseforge
         // loaderType is the modloader example: forge
         const [
           loaderType,

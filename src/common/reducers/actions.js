@@ -36,7 +36,6 @@ import {
   FMLLIBS_FORGE_BASE_URL,
   FMLLIBS_OUR_BASE_URL,
   FORGE,
-  FTB,
   GDL_LEGACYJAVAFIXER_MOD_URL,
   LATEST_JAVA_VERSION,
   MC_RESOURCES_URL,
@@ -55,7 +54,6 @@ import {
   getFabricJson,
   getFabricManifest,
   getForgeManifest,
-  getFTBModpackVersionData,
   getJavaLatestManifest,
   getJavaManifest,
   getMcManifest,
@@ -1558,262 +1556,6 @@ export function downloadForge(instanceName) {
   };
 }
 
-export function processFTBManifest(instanceName) {
-  return async (dispatch, getState) => {
-    const state = getState();
-    const { manifest } = _getCurrentDownloadItem(state);
-    const instancesPath = _getInstancesPath(state);
-    const instancePath = path.join(instancesPath, instanceName);
-    const fileHashes = {};
-
-    const { files: allFiles } = manifest;
-    const concurrency = state.settings.concurrentDownloads;
-
-    const files = allFiles.filter(v => v.url && v.url !== '');
-    const CFFiles = allFiles.filter(v => !v.url || v.url === '');
-
-    dispatch(updateDownloadStatus(instanceName, 'Downloading CF files...'));
-    const addonsHashmap = {};
-    const addonsFilesHashmap = {};
-
-    // DOWNLOAD CF FILES
-
-    const _getAddons = async () => {
-      console.log(CFFiles.map(v => v.curseforge?.project));
-      const addons = await getMultipleAddons(
-        CFFiles.map(v => v.curseforge?.project)
-      );
-
-      addons.forEach(v => {
-        addonsHashmap[v.id] = v;
-      });
-    };
-
-    const _getAddonFiles = async () => {
-      await pMap(
-        CFFiles,
-        async item => {
-          const modManifest = await getAddonFile(
-            item.curseforge?.project,
-            item.curseforge?.file
-          );
-
-          addonsFilesHashmap[item.curseforge?.project] = modManifest;
-        },
-        { concurrency: concurrency + 10 }
-      );
-    };
-
-    await Promise.all([_getAddons(), _getAddonFiles()]);
-
-    let modManifests = [];
-    const optedOutMods = [];
-    await pMap(
-      CFFiles,
-      async item => {
-        if (!addonsHashmap[item.curseforge?.project]) return;
-        let ok = false;
-        let tries = 0;
-        /* eslint-disable no-await-in-loop */
-        do {
-          tries += 1;
-          if (tries !== 1) {
-            await new Promise(resolve => setTimeout(resolve, 5000));
-          }
-
-          const addon = addonsHashmap[item.curseforge?.project];
-          const isResourcePack = addon.classId === 12;
-          const modManifest = addonsFilesHashmap[item.curseforge?.project];
-          const destFile = path.join(
-            _getInstancesPath(state),
-            instanceName,
-            isResourcePack ? 'resourcepacks' : 'mods',
-            modManifest.fileName
-          );
-
-          const fileExists = await fse.pathExists(destFile);
-
-          if (!fileExists) {
-            if (!modManifest.downloadUrl) {
-              const normalizedModData = normalizeModData(
-                modManifest,
-                item.curseforge?.project,
-                addon.name
-              );
-
-              optedOutMods.push({ addon, modManifest: normalizedModData });
-              return;
-            }
-            await downloadFile(destFile, modManifest.downloadUrl);
-            modManifests = modManifests.concat(
-              normalizeModData(
-                modManifest,
-                item.curseforge?.project,
-                addon.name
-              )
-            );
-          }
-          const percentage = (modManifests.length * 100) / CFFiles.length - 1;
-
-          dispatch(updateDownloadProgress(percentage > 0 ? percentage : 0));
-          ok = true;
-        } while (!ok && tries <= 3);
-        /* eslint-enable no-await-in-loop */
-      },
-      { concurrency }
-    );
-
-    if (optedOutMods.length) {
-      await new Promise((resolve, reject) => {
-        dispatch(
-          openModal('OptedOutModsList', {
-            optedOutMods,
-            instancePath: path.join(_getInstancesPath(state), instanceName),
-            resolve,
-            reject,
-            abortCallback: () => {
-              setTimeout(
-                () => reject(new Error('Download Aborted by the user')),
-                300
-              );
-            }
-          })
-        );
-      });
-    }
-
-    modManifests = modManifests.concat(
-      ...optedOutMods.map(v =>
-        normalizeModData(v.modManifest, v.modManifest.projectID, v.addon.name)
-      )
-    );
-
-    // DOWNLOAD FTB FILES
-
-    let prev = 0;
-    const updatePercentage = downloaded => {
-      const percentage = (downloaded * 100) / files.length;
-      const progress = parseInt(percentage, 10);
-      if (progress !== prev) {
-        prev = progress;
-        dispatch(updateDownloadProgress(progress));
-      }
-    };
-
-    let mappedFiles = files.map(async item => {
-      return {
-        ...item,
-        path: path.join(instancePath, item.path, item.name)
-      };
-    });
-    dispatch(updateDownloadStatus(instanceName, 'Downloading FTB files...'));
-    await downloadInstanceFiles(
-      mappedFiles,
-      updatePercentage,
-      state.settings.concurrentDownloads
-    );
-
-    mappedFiles = await pMap(
-      files,
-      async item => {
-        const filePath = path.join(instancePath, item.path, item.name);
-        const hash = await getFileMurmurHash2(filePath);
-
-        return {
-          ...item,
-          path: path.join(instancePath, item.path, item.name),
-          murmur2: hash
-        };
-      },
-      { concurrency: 10 }
-    );
-
-    dispatch(updateDownloadStatus(instanceName, 'Finalizing FTB files...'));
-
-    const data = await getAddonsByFingerprint(
-      Object.values(mappedFiles).map(v => v.murmur2)
-    );
-    const { exactMatches } = data || {};
-
-    for (const item of exactMatches) {
-      if (item.file) {
-        fileHashes[item.file.fileFingerprint] = item;
-      }
-    }
-
-    mappedFiles = mappedFiles.filter(
-      v => v.name.split(/\.(?=[^.]+$)/)[1] === 'jar'
-    );
-
-    await pMap(
-      mappedFiles,
-      async item => {
-        let ok = false;
-        let tries = 0;
-        /* eslint-disable no-await-in-loop */
-        do {
-          tries += 1;
-
-          if (tries !== 1) {
-            await new Promise(resolve => setTimeout(resolve, 5000));
-          }
-          try {
-            const exactMatch = fileHashes[item.murmur2];
-
-            if (exactMatch) {
-              const { modId } = exactMatch.file;
-              try {
-                const addon = await getAddon(modId);
-                const mod = normalizeModData(
-                  exactMatch.file,
-                  modId,
-                  addon.name
-                );
-                mod.fileName = path.basename(item.name);
-                modManifests = modManifests.concat(mod);
-              } catch {
-                modManifests = modManifests.concat({
-                  fileName: path.basename(item.name),
-                  displayName: path.basename(item.name),
-                  packageFingerprint: item.murmur2
-                });
-              }
-            } else {
-              modManifests = modManifests.concat({
-                fileName: item.name,
-                displayName: item.name,
-                version: item.version,
-                downloadUrl: item.url,
-                FTBmodId: item.id
-              });
-            }
-
-            const percentage = (modManifests.length * 100) / mappedFiles.length;
-
-            dispatch(updateDownloadProgress(percentage > 0 ? percentage : 0));
-            ok = true;
-          } catch (err) {
-            console.error(err);
-          }
-        } while (!ok && tries <= 3);
-        /* eslint-enable no-await-in-loop */
-      },
-      { concurrency }
-    );
-
-    await dispatch(
-      updateInstanceConfig(instanceName, config => {
-        return {
-          ...config,
-          mods: [...(config.mods || []), ...modManifests]
-        };
-      })
-    );
-
-    await fse.remove(path.join(_getTempPath(state), instanceName));
-  };
-}
-
 export function processForgeManifest(instanceName) {
   return async (dispatch, getState) => {
     const state = getState();
@@ -2220,11 +1962,8 @@ export function downloadInstance(instanceName) {
         await dispatch(downloadForge(instanceName));
       }
 
-      // analyze source and do it for ftb and forge
-
-      if (manifest && loader?.source === FTB)
-        await dispatch(processFTBManifest(instanceName));
-      else if (manifest && loader?.source === CURSEFORGE)
+      // analyze source for forge
+      if (manifest && loader?.source === CURSEFORGE)
         await dispatch(processForgeManifest(instanceName));
 
       dispatch(updateDownloadProgress(0));
@@ -2358,45 +2097,6 @@ export const changeModpackVersion = (instanceName, newModpackData) => {
           undefined,
           undefined,
           { isUpdate: true, bypassCopy: true }
-        )
-      );
-    } else if (instance.loader.source === FTB) {
-      const imageURL = newModpackData.imageUrl;
-
-      await downloadFile(
-        path.join(
-          _getInstancesPath(state),
-          instanceName,
-          `background${path.extname(imageURL)}`
-        ),
-        imageURL
-      );
-
-      const newModpack = await getFTBModpackVersionData(
-        instance.loader?.projectID,
-        newModpackData.id
-      );
-
-      const loader = {
-        loaderType: instance.loader?.loaderType,
-
-        mcVersion: newModpack.targets[1].version,
-        loaderVersion: convertcurseForgeToCanonical(
-          `forge-${newModpack.targets[0].version}`,
-          newModpack.targets[1].version,
-          state.app.forgeManifest
-        ),
-        fileID: newModpack?.id,
-        projectID: instance.loader?.projectID,
-        source: instance.loader?.source
-      };
-
-      dispatch(
-        addToQueue(
-          instanceName,
-          loader,
-          null,
-          `background${path.extname(imageURL)}`
         )
       );
     }
