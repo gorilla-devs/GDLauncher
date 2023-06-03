@@ -6,6 +6,8 @@ import { ipcRenderer } from 'electron';
 import { useSelector, useDispatch } from 'react-redux';
 import { push } from 'connected-react-router';
 import { message } from 'antd';
+import axios from 'axios';
+import adapter from 'axios/lib/adapters/http';
 import RouteWithSubRoutes from '../../common/components/RouteWithSubRoutes';
 import {
   loginWithAccessToken,
@@ -72,6 +74,11 @@ function DesktopRoot({ store }) {
   });
 
   const init = async () => {
+    console.log(axios.defaults.adapter);
+    axios.defaults.adapter = adapter;
+    console.log(axios.defaults.adapter);
+    console.log(adapter);
+
     dispatch(requesting(features.mcAuthentication));
     const userDataStatic = await ipcRenderer.invoke('getUserData');
     const userData = dispatch(updateUserData(userDataStatic));

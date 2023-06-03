@@ -49,6 +49,8 @@
     "default-param-last": "off",
     "no-promise-executor-return": "off",
     "import/no-import-module-exports": "off",
+    "react/no-unknown-property": "off",
+    "react/no-unstable-nested-components": "off",
     "react/destructuring-assignment": "off",
     "promise/param-names": "error",
     "promise/always-return": "error",
