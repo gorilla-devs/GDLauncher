@@ -1,4 +1,4 @@
-import { version } from '../../../package.json';
+import pkgJson from '../../../package.json';
 
 function queue(...args) {
   if (typeof window !== 'undefined') {
@@ -12,7 +12,7 @@ class GAnalytics {
     this.curPage = 'N/A';
     this.userId = null;
     this.setProperties({
-      appVersion: version
+      appVersion: pkgJson.version
     });
   }
 
