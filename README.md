@@ -1,5 +1,8 @@
+## Try Out Carbon
+GDLauncher has been rewritten from the ground up in a more efficient and reliable tech stack, and [the new version, "Carbon"](https://github.com/gorilla-devs/GDLauncher-Carbon) has already reached and surpassed feature-parity. We are now working on polishing the experience and adding new features, and while this version will still be available for download, it will no longer be maintained. Due to the very high number of game-breaking bugs recently reported, we recommend you to switch to the new [GDLauncher Carbon](https://github.com/gorilla-devs/GDLauncher-Carbon) as soon as possible.
+
 # GDLauncher
-[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity) 
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-no-red.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity) 
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com) 
 [![GitHub issues](https://img.shields.io/github/issues-raw/gorilla-devs/GDLauncher.svg)](https://github.com/gorilla-devs/GDLauncher/issues) 
 [![GitHub pull requests](https://img.shields.io/github/issues-pr/gorilla-devs/GDLauncher.svg)](https://github.com/gorilla-devs/GDLauncher/pulls) 
@@ -40,8 +43,9 @@
   - [🎓 License](#-license)
   </details>
 
+*[Carbon](https://github.com/gorilla-devs/GDLauncher-Carbon) has fully redesigned the UI and UX to make it more user-friendly and modern!*
 <p align="center">
-    <img width="800" height="auto" src="https://gdevs.io/showcase.jpg" alt="GDLauncher" />
+    <img width="800" height="auto" src="https://cdn.gdl.gg/assets/website-home-app-screenshot.webp" alt="GDLauncher" />
 </p>
 
 ## 🎮 What is GDLauncher
@@ -55,13 +59,9 @@ This is an example of the time that GDLauncher takes to install a modpack in com
 - GDLauncher: `52s`
 - Twitch Launcher: `145s`
 
-<p align="center">
-    <img width="800" height="auto" src="https://gdevs.io/comparison.gif" alt="GDLauncher" />
-</p>
-
 ## 🚀 Getting Started
 
-Below you will find everything you need to know about the launcher. If you want to download the latest stable release you can do it from our official website ([gdevs.io](https://gdevs.io)). If you want to test the possibly unstable features, you can clone the repo and compile it yourself.
+Below you will find everything you need to know about the launcher. If you want to download the latest stable release you can do it from our official website ([gdlauncher.com](https://gdlauncher.com/)). If you want to test the possibly unstable features, you can clone the repo and compile it yourself.
 
 ## 🎮 Download
 
