@@ -1,5 +1,7 @@
-## Try Out Carbon
+# THIS REPO IS NO LONGER ACTIVE. CHECK OUT THE NEW [GDLAUNCHER CARBON](https://github.com/gorilla-devs/GDLauncher-Carbon)
 GDLauncher has been rewritten from the ground up in a more efficient and reliable tech stack, and [the new version, "Carbon"](https://github.com/gorilla-devs/GDLauncher-Carbon) has already reached and surpassed feature-parity. We are now working on polishing the experience and adding new features, and while this version will still be available for download, it will no longer be maintained. Due to the very high number of game-breaking bugs recently reported, we recommend you to switch to the new [GDLauncher Carbon](https://github.com/gorilla-devs/GDLauncher-Carbon) as soon as possible.
+
+
 
 # GDLauncher
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-no-red.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity) 
