@@ -23,7 +23,7 @@ const {
 } = require('base64url');
 const { URL } = require('url');
 const UserAgent = require('user-agents');
-const nsfw = require('./nsfw');
+const nsfw = require('nsfw');
 const napi = require('./native/napi.node');
 
 // console.log(napi.fibonacci(10));
@@ -35,6 +35,7 @@ let tray;
 let watcher;
 
 const discordRPC = require('./discordRPC');
+const { downloadInstanceFiles, downloadFile } = require('./downloadFile');
 
 const gotTheLock = app.requestSingleInstanceLock();
 
@@ -317,7 +318,7 @@ function createWindow() {
       if (details.url.includes('www.google-analytics.com')) {
         // eslint-disable-next-line
         details.responseHeaders['Access-Control-Allow-Origin'] = [
-          'http://localhost:3000'
+          'http://localhost:8080'
         ];
       } else {
         // eslint-disable-next-line
@@ -370,8 +371,8 @@ function createWindow() {
 
   mainWindow.loadURL(
     isDev
-      ? 'http://localhost:3000'
-      : `file://${path.join(__dirname, '../build/index.html')}`,
+      ? 'http://localhost:8080'
+      : `file://${path.join(__dirname, '../../build/web/index.html')}`,
     {
       userAgent: 'GDLauncher'
     }
@@ -899,6 +900,24 @@ ipcMain.handle('download-optedout-mods', async (e, { mods, instancePath }) => {
       win = null;
     });
   }
+});
+
+ipcMain.handle(
+  'download-instance-files',
+  async (e, arr, updatePercentage, threads) => {
+    const back = downloadInstanceFiles(
+      mainWindow,
+      arr,
+      updatePercentage,
+      threads
+    );
+    log.log('Back:', back);
+    return back;
+  }
+);
+
+ipcMain.handle('download-file', async (e, fileName, url, onProgress) => {
+  return downloadFile(mainWindow, fileName, url, onProgress);
 });
 
 ipcMain.handle('start-listener', async (e, dirPath) => {
